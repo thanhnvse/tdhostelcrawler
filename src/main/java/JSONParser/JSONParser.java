@@ -30,7 +30,8 @@ public class JSONParser {
             utility.setLongitude(Double.parseDouble(obj.getJSONArray("results").getJSONObject(i).getJSONObject("geometry").getJSONObject("location").get("lng").toString()));
             utility.setName(obj.getJSONArray("results").getJSONObject(i).getString("name"));
             utility.setTypeId(ggdao.getUtilityIdFromAUType(name));
-            ggdao.insertAUtility(utility);
+//            ggdao.insertAUtility(utility);
+            System.out.println(utility.getName());
         }
     }
 }
