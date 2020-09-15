@@ -1,16 +1,9 @@
 package main.java.JSONParser;
 
 import main.java.dao.GGDAO;
-import main.java.entity.UCategory;
-import main.java.entity.UType;
 import main.java.entity.Utility;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static main.java.constants.StaticPlaceType.*;
 
 public class JSONParser {
     public void parseJSONToObject(String json){
@@ -31,6 +24,7 @@ public class JSONParser {
             utility.setName(obj.getJSONArray("results").getJSONObject(i).getString("name"));
             utility.setTypeId(ggdao.getUtilityIdFromAUType(name));
             ggdao.insertAUtility(utility);
+//            System.out.println(utility.getName());
         }
     }
 }

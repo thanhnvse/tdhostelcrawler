@@ -8,13 +8,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import main.java.JSONParser.JSONParser;
+import main.java.crawler.AreaCrawler;
 import main.java.crawler.GoogleApiCrawler;
+import main.java.crawler.PhongtotCrawler;
 import main.java.dao.GGDAO;
 import main.java.dao.SampleHostelDAO;
-import main.java.entity.Facility;
-import main.java.entity.Sample;
-import main.java.entity.SampleHostel;
-import main.java.entity.Street;
+import main.java.entity.*;
 import main.java.util.DBUtil;
 import org.hibernate.HibernateException;
 import org.jsoup.Jsoup;
@@ -30,9 +29,28 @@ public class GetDocumentFromURL {
 //            getDocumentFromURL.thuenhatro360();
 //            GGDAO ggdao = new GGDAO();
 //            ggdao.insertEntity();
-            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
-            JSONParser jsonParser = new JSONParser();
-            jsonParser.parseJSONToObject(googleApiCrawler.getGoogleApiInfo(10.8035455,106.6182532,1500000,"school"));
+
+            PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
+            phongtotCrawler.getSampleHostelDataFromPhongTot();
+
+//            SampleHostelDAO hostelDAO = new SampleHostelDAO();
+//            List<Service> facilityList =  hostelDAO.getAllServices();
+//            System.out.println("Size :" + facilityList.size());
+//            for(int i=0; i<facilityList.size();i++){
+//                System.out.println("ALLLL :"+ facilityList.get(i).getId() +" "+ facilityList.get(i).getName());
+//            }
+
+//            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
+//            JSONParser jsonParser = new JSONParser();
+//            GGDAO ggdao = new GGDAO();
+//            List<String> typeList = ggdao.createTypeListToCrawl();
+//            for(String type : typeList){
+//                jsonParser.parseJSONToObject(googleApiCrawler.getGoogleApiInfo(10.8035455,106.6182532,1500000,type));
+//                System.out.println("Finish :" + type);
+//            }
+
+//            AreaCrawler areaCrawler = new AreaCrawler();
+//            areaCrawler.getSGApiInfo();
         }catch (Exception e){
             e.printStackTrace();
         }
