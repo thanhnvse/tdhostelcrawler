@@ -19,17 +19,16 @@ import java.util.List;
 public class PhongtotCrawler {
     public List<Sample> getSampleHostelDataFromPhongTot() throws IOException, SQLException, NamingException, ClassNotFoundException {
         List<Sample> sampleList = new ArrayList<>();
-        Sample sample = new Sample();
         SampleHostelDAO hostelDAO =  new SampleHostelDAO();
         List<Facility> facilityList = hostelDAO.getAllFacilities();
         List<Service> serviceList = hostelDAO.getAllServices();
         String mainUrl = "http://phongtot.vn/phong-tro-nha-tro?fill=79";
         for(int pageNumber = 0 ; pageNumber < 1; pageNumber++){
-            Document phongtotDoc = Jsoup.connect(mainUrl+"&page="+pageNumber).timeout(10000).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
+            Document phongtotDoc = Jsoup.connect(mainUrl+"&page="+pageNumber).timeout(10000).userAgent("Mozilla/5.0 " +
+                    "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
             Elements urlList = phongtotDoc.getElementsByClass("room-item");
-
             for(Element sampleElement : urlList){
-//                System.out.println("List: "+ urlList);
+                Sample sample = new Sample();
                 //street
                 String streetName = sampleElement.getElementsByClass("block-room-item-address").select("a").text();
                 System.out.println("Street Name all: "+ streetName);
@@ -48,8 +47,12 @@ public class PhongtotCrawler {
                 System.out.println("District :"+ district);
 
                 //dien tich
-                String superficiality = sampleElement.getElementsByClass("pull-left").select("a").text();
+                String superString = sampleElement.getElementsByClass("pull-left").select("a").text();
+                superString = superString.replaceAll("[^0-9]+", "/");
+                String[] superItem = superString.split("/");
+                double superficiality = Double.parseDouble(superItem[0]);
                 System.out.println("Superficiality: "+ superficiality);
+                sample.setSuperficiality(superficiality);
 
                 //gia ca
                 String priceString = sampleElement.getElementsByClass("block-room-item-price").select("a").text();
@@ -63,10 +66,12 @@ public class PhongtotCrawler {
                 }
                 double price = Double.parseDouble(priceStringAll);
                 System.out.println("Price: "+price);
+                sample.setPrice(price);
 
                 //chi tiet
                 String detailUrl = sampleElement.getElementsByClass("block-room-item-title").select("a").attr("href");
-                Document detailDoc = Jsoup.connect(detailUrl).timeout(10000).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
+                Document detailDoc = Jsoup.connect(detailUrl).timeout(10000).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64)" +
+                        " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
                 Elements detailUrlList = detailDoc.getElementsByClass("col-md-9");
                 for(Element detailElement : detailUrlList){
 //                    System.out.println(detailElement);
@@ -116,7 +121,8 @@ public class PhongtotCrawler {
 //                    System.out.println("Size truoc khi get int la : "+ services.size());
                     List<Integer> facilityInteger = getFacilityIdFromFacilityName(facilities, facilityList);
                     List<Integer> serviceInteger = getServiceIdFromServiceName(services, serviceList);
-
+                    sample.setFacilities(facilityInteger);
+                    sample.setServices(serviceInteger);
                     for(Integer faci : facilityInteger){
                         System.out.println("Faci :" + faci);
                     }
@@ -125,10 +131,14 @@ public class PhongtotCrawler {
                         System.out.println("Ser :" + ser);
                     }
                     //longitude, latitude
-                    String latitude = detailElement.getElementsByClass("gllpLatitude").attr("value");
-                    String longitude = detailElement.getElementsByClass("gllpLongitude").attr("value");
+                    double latitude = Double.parseDouble(detailElement.getElementsByClass("gllpLatitude").attr("value"));
+                    double longitude = Double.parseDouble(detailElement.getElementsByClass("gllpLongitude").attr("value"));
                     System.out.println("Latitude name :"+ latitude);
                     System.out.println("Longitude name :"+ longitude);
+                    sample.setLatitude(latitude);
+                    sample.setLongitude(longitude);
+                    sample.setStreetId(1);
+                    hostelDAO.insertSample(sample);
                     System.out.println("-------------------------------");
                 }
             }

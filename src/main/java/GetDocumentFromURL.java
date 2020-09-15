@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import main.java.JSONParser.JSONParser;
+import main.java.crawler.AreaCrawler;
 import main.java.crawler.GoogleApiCrawler;
 import main.java.crawler.PhongtotCrawler;
 import main.java.dao.GGDAO;
@@ -47,6 +48,9 @@ public class GetDocumentFromURL {
 //                jsonParser.parseJSONToObject(googleApiCrawler.getGoogleApiInfo(10.8035455,106.6182532,1500000,type));
 //                System.out.println("Finish :" + type);
 //            }
+
+//            AreaCrawler areaCrawler = new AreaCrawler();
+//            areaCrawler.getSGApiInfo();
         }catch (Exception e){
             e.printStackTrace();
         }
