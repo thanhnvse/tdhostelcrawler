@@ -30,16 +30,16 @@ public class GetDocumentFromURL {
 //            GGDAO ggdao = new GGDAO();
 //            ggdao.insertEntity();
 
+            //get data crawl from phongtot
             PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
             phongtotCrawler.getSampleHostelDataFromPhongTot();
 
-//            SampleHostelDAO hostelDAO = new SampleHostelDAO();
-//            List<Service> facilityList =  hostelDAO.getAllServices();
-//            System.out.println("Size :" + facilityList.size());
-//            for(int i=0; i<facilityList.size();i++){
-//                System.out.println("ALLLL :"+ facilityList.get(i).getId() +" "+ facilityList.get(i).getName());
-//            }
+            //set default value of UCategory, UType and store in db
+//            GGDAO ggdao = new GGDAO();
+//            ggdao.insertUCategoryList();
+//            ggdao.insertAUType();
 
+            //crawl and parse nearby utilities using gg map api
 //            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
 //            JSONParser jsonParser = new JSONParser();
 //            GGDAO ggdao = new GGDAO();
@@ -49,8 +49,11 @@ public class GetDocumentFromURL {
 //                System.out.println("Finish :" + type);
 //            }
 
+
+            //crawl json file to get district, ward, street
 //            AreaCrawler areaCrawler = new AreaCrawler();
 //            areaCrawler.getSGApiInfo();
+
         }catch (Exception e){
             e.printStackTrace();
         }
