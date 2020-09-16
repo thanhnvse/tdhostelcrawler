@@ -23,7 +23,7 @@ public class PhongtotCrawler {
         List<Facility> facilityList = hostelDAO.getAllFacilities();
         List<Service> serviceList = hostelDAO.getAllServices();
         String mainUrl = "http://phongtot.vn/phong-tro-nha-tro?fill=79";
-        for(int pageNumber = 0 ; pageNumber < 1; pageNumber++){
+        for(int pageNumber = 0 ; pageNumber < 100; pageNumber++){
             Document phongtotDoc = Jsoup.connect(mainUrl+"&page="+pageNumber).timeout(10000).userAgent("Mozilla/5.0 " +
                     "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
             Elements urlList = phongtotDoc.getElementsByClass("room-item");
