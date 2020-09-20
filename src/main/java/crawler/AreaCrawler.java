@@ -1,11 +1,17 @@
 package main.java.crawler;
 
+import main.java.dao.AreaDAO;
+import main.java.entity.District;
+import main.java.entity.Street;
+import main.java.entity.Ward;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class AreaCrawler {
     public void getSGApiInfo(){
@@ -15,26 +21,66 @@ public class AreaCrawler {
                     "UTF8"));
             String str = in.readLine();
             JSONObject obj = new JSONObject(str);
+            AreaDAO areaDAO = new AreaDAO();
+            List<String> streetListAll = new ArrayList<>();
             //district
+            District districtDTO = new District();
             JSONArray districtList = obj.getJSONArray("district");
-            System.out.println("District size: "+ districtList.length());
+//            System.out.println("District size: "+ districtList.length());
+            //set default value id
+            int id = 1000;
+            int wardId = 1000;
             for(int i = 0; i < districtList.length(); i++) {
                 String district = districtList.getJSONObject(i).get("name").toString();
-                System.out.println("District : " + district);
+//                System.out.println("District : " + district);
+                String pre = districtList.getJSONObject(i).get("pre").toString();
+//                System.out.println("Pre : " + pre);
+                String districtData = pre + " " + district;
+                id++;
+                districtDTO.setDistrictId(id);
+                districtDTO.setDistrictName(districtData);
+                districtDTO.setProvinceId(1);
+//                areaDAO.insertDistrict(districtDTO);
                 //ward
                 JSONArray wardList = districtList.getJSONObject(i).getJSONArray("ward");
-                System.out.println("Ward size : "+wardList.length());
+//                System.out.println("Ward size : "+wardList.length());
                 for(int j = 0; j < wardList.length(); j++){
+                    wardId++;
                     String ward = wardList.getJSONObject(j).get("name").toString();
-                    System.out.println("Ward : "+ ward);
+//                    System.out.println("Ward : "+ ward);
+                    Ward wardDTO = new Ward();
+                    wardDTO.setWardId(wardId);
+                    wardDTO.setWardName("Phường "+ward);
+                    wardDTO.setDistrictId(id);
+//                    areaDAO.insertWard(wardDTO);
                 }
                 //street
                 JSONArray streetList = districtList.getJSONObject(i).getJSONArray("street");
-                System.out.println("Street size : "+streetList.length());
                 for(int k = 0; k < streetList.length(); k++){
                     String street = streetList.get(k).toString();
-                    System.out.println("Street : "+ street);
+//                    System.out.println("Street : "+ street);
+                    streetListAll.add(street);
                 }
+            }
+            //delete duplicate value
+//            System.out.println("Size 1 : "+ streetListAll.size());
+            List<String> arrTemp = new ArrayList<>();
+            for (int i = 0; i < streetListAll.size(); i++) {
+                if (!arrTemp.contains(streetListAll.get(i))) {
+                    arrTemp.add(streetListAll.get(i));
+                }
+            }
+            streetListAll.clear();
+            streetListAll.addAll(arrTemp);
+//            System.out.println("Size 2 : "+ streetListAll.size());
+            int streetId = 1000;
+            for (int a = 0; a < streetListAll.size(); a++){
+//                System.out.println("Street : "+ streetListAll.get(a));
+                Street street = new Street();
+                streetId++;
+                street.setStreetId(streetId);
+                street.setStreetName(streetListAll.get(a));
+                areaDAO.insertStreet(street);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
