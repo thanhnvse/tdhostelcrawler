@@ -31,8 +31,8 @@ public class GetDocumentFromURL {
 //            ggdao.insertEntity();
 
             //get data crawl from phongtot
-            PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
-            phongtotCrawler.getSampleHostelDataFromPhongTot();
+//            PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
+//            phongtotCrawler.getSampleHostelDataFromPhongTot();
 
             //set default value of UCategory, UType and store in db
 //            GGDAO ggdao = new GGDAO();
@@ -51,8 +51,8 @@ public class GetDocumentFromURL {
 
 
             //crawl json file to get district, ward, street
-//            AreaCrawler areaCrawler = new AreaCrawler();
-//            areaCrawler.getSGApiInfo();
+            AreaCrawler areaCrawler = new AreaCrawler();
+            areaCrawler.getSGApiInfo();
 
         }catch (Exception e){
             e.printStackTrace();
