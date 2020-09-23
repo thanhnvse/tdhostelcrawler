@@ -1,9 +1,6 @@
 package main.java.dao;
 
-import main.java.entity.Facility;
-import main.java.entity.Sample;
-import main.java.entity.Service;
-import main.java.entity.Utility;
+import main.java.entity.*;
 import main.java.util.DBUtil;
 
 import javax.naming.NamingException;
@@ -115,26 +112,82 @@ public class SampleHostelDAO {
         return servicesIdList;
     }
 
-    public static int getDistrictId (String districtName){
-        List<Integer> servicesIdList = new ArrayList<>();
-        String query = "Select district_id, district_name from district";
+    public List<Street> getAllStreet (){
+        List<Street> streetList = new ArrayList<>();
+        String query = "select street_id, street_name from street";
             try(Connection c = DBUtil.getConnectDB();
                 PreparedStatement ps = c.prepareStatement(query)) {
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
-                    servicesIdList.add(rs.getInt("service_id"));
+                    Street street = new Street();
+                    street.setStreetId(rs.getInt("street_id"));
+                    street.setStreetName(rs.getString("street_name"));
+                    streetList.add(street);
                 }
             }catch (Exception e){
                 e.printStackTrace();
             }
-        return 1;
+        return streetList;
+    }
+
+    public List<Ward> getAllWard (){
+        List<Ward> wardList = new ArrayList<>();
+        String query = "select ward_id, ward_name, district_id from ward";
+        try(Connection c = DBUtil.getConnectDB();
+            PreparedStatement ps = c.prepareStatement(query)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Ward ward = new Ward();
+                ward.setWardId(rs.getInt("ward_id"));
+                ward.setWardName(rs.getString("ward_name"));
+                ward.setDistrictId(rs.getInt("district_id"));
+                wardList.add(ward);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return wardList;
+    }
+    public List<District> getAllDistrict (){
+        List<District> districtList = new ArrayList<>();
+        String query = "select district_id, district_name from district";
+        try(Connection c = DBUtil.getConnectDB();
+            PreparedStatement ps = c.prepareStatement(query)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                District district = new District();
+                district.setDistrictId(rs.getInt("district_id"));
+                district.setDistrictName(rs.getString("district_name"));
+                districtList.add(district);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return districtList;
+    }
+
+    public void insertStreetWard(StreetWard streetWard) {
+        String query = "INSERT INTO street_ward (ward_id, street_id) VALUES (?, ?)";
+        try(Connection c = DBUtil.getConnectDB();
+            PreparedStatement ps = c.prepareStatement(query)) {
+
+            ps.setInt(1,streetWard.getWardId());
+            ps.setInt(2,streetWard.getStreetId());
+
+            int result = ps.executeUpdate();
+            // check the affected rows
+            if (result > 0) {
+                System.out.println("INSERT STREET WARD SUCCESSFULLY");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void insertSample(Sample sample) {
         String query = "INSERT INTO sample (facility_ids, latitude, longitude, price, service_ids, superficiality, street_ward_id) VALUES ( ?, ?, ?, ?, ?, ?, ?)";
-        long id = 0;
         try(Connection c = DBUtil.getConnectDB();
-            PreparedStatement ps = c.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement ps = c.prepareStatement(query)) {
             List<Integer> facilityInteger = sample.getFacilities();
             List<Integer> serviceInteger = sample.getServices();
 
@@ -149,19 +202,51 @@ public class SampleHostelDAO {
             int result = ps.executeUpdate();
             // check the affected rows
             if (result > 0) {
-                // get the ID back
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        id = rs.getLong(1);
-                        System.out.println("INSERT SAMPLE SUCCESSFULLY");
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                System.out.println("INSERT SAMPLE SUCCESSFULLY");
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
+    public boolean checkInsert(int wardId, int streetId) {
+        String query = "SELECT ward_id, street_id from street_ward where ward_id = "+ wardId +" and street_id = " + streetId;
+        try (Connection c = DBUtil.getConnectDB();
+            Statement ps = c.createStatement();
+            ResultSet rs = ps.executeQuery(query)){
+            return rs.isBeforeFirst();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Integer getStreetWardId (int wardId, int streetId){
+        String query = "select street_ward_id from street_ward where ward_id = "+ wardId + "and street_id = "+ streetId;
+        int streetWardId = 0;
+        try(Connection c = DBUtil.getConnectDB();
+            PreparedStatement ps = c.prepareStatement(query)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                streetWardId = rs.getInt("street_ward_id");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return streetWardId;
+    }
+
+    public boolean checkInsertSample(double price, double superficiality, int streetWardId) {
+        String query = "SELECT price, superficiality, street_ward_id from sample where price = "+ price +"and superficiality = " + superficiality
+                + "and street_ward_id = " + streetWardId;
+        try (Connection c = DBUtil.getConnectDB();
+             Statement ps = c.createStatement();
+             ResultSet rs = ps.executeQuery(query)){
+            System.out.println(";;; "+rs.isBeforeFirst());
+            return rs.isBeforeFirst();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

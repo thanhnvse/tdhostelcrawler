@@ -28,8 +28,8 @@ public class AreaCrawler {
             JSONArray districtList = obj.getJSONArray("district");
 //            System.out.println("District size: "+ districtList.length());
             //set default value id
-            int id = 1000;
-            int wardId = 1000;
+            int id = 0;
+            int wardId = 0;
             for(int i = 0; i < districtList.length(); i++) {
                 String district = districtList.getJSONObject(i).get("name").toString();
 //                System.out.println("District : " + district);
@@ -73,7 +73,7 @@ public class AreaCrawler {
             streetListAll.clear();
             streetListAll.addAll(arrTemp);
 //            System.out.println("Size 2 : "+ streetListAll.size());
-            int streetId = 1000;
+            int streetId = 0;
             for (int a = 0; a < streetListAll.size(); a++){
 //                System.out.println("Street : "+ streetListAll.get(a));
                 Street street = new Street();
