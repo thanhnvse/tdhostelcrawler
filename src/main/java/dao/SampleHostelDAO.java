@@ -237,12 +237,11 @@ public class SampleHostelDAO {
     }
 
     public boolean checkInsertSample(double price, double superficiality, int streetWardId) {
-        String query = "SELECT price, superficiality, street_ward_id from sample where price = "+ price +"and superficiality = " + superficiality
-                + "and street_ward_id = " + streetWardId;
+        String query = "SELECT price, superficiality, street_ward_id from sample where price = '"+ price +"'and superficiality = '" + superficiality
+                + "'and street_ward_id = " + streetWardId;
         try (Connection c = DBUtil.getConnectDB();
              Statement ps = c.createStatement();
              ResultSet rs = ps.executeQuery(query)){
-            System.out.println(";;; "+rs.isBeforeFirst());
             return rs.isBeforeFirst();
         }catch (Exception e){
             e.printStackTrace();

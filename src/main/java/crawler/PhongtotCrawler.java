@@ -2,6 +2,8 @@ package main.java.crawler;
 
 import main.java.dao.SampleHostelDAO;
 import main.java.entity.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,8 +12,10 @@ import org.jsoup.select.Elements;
 import javax.naming.NamingException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static main.java.constants.StaticDistrict.*;
 
@@ -26,8 +30,9 @@ public class PhongtotCrawler {
         List<Service> serviceList = hostelDAO.getAllServices();
         String mainUrl = "http://phongtot.vn/phong-tro-nha-tro?fill=79";
         try{
-            for(int pageNumber = 0 ; pageNumber < 1; pageNumber++){
-                Document phongtotDoc = Jsoup.connect(mainUrl+"&page="+pageNumber).timeout(10000).userAgent("Mozilla/5.0 " +
+            for(int pageNumber = 0; pageNumber < 1; pageNumber++){
+                System.out.println("Page :" + pageNumber);
+                Document phongtotDoc = Jsoup.connect(mainUrl+"&page="+pageNumber).timeout(50000).userAgent("Mozilla/5.0 " +
                         "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
                 Elements urlList = phongtotDoc.getElementsByClass("room-item");
                 for(Element sampleElement : urlList){
@@ -40,18 +45,23 @@ public class PhongtotCrawler {
                     String[] addressList = streetName.split("-");
 
                     //district
-                    String district = addressList[2];
                     int districtId = 0;
-                    if(district.toLowerCase().contains(BINH_CHANH)|| district.toLowerCase().contains(CAN_GIO)||
-                            district.toLowerCase().contains(CU_CHI)|| district.toLowerCase().contains(HOC_MON)||
-                            district.toLowerCase().contains(NHA_BE)){
-                        district = "Huyện"+ addressList[2];
+                    String district = "";
+                    try{
+                        district = addressList[2];
+                        if(district.toLowerCase().contains(BINH_CHANH)|| district.toLowerCase().contains(CAN_GIO)||
+                                district.toLowerCase().contains(CU_CHI)|| district.toLowerCase().contains(HOC_MON)||
+                                district.toLowerCase().contains(NHA_BE)){
+                            district = "Huyện"+ addressList[2];
 //                        System.out.println("District :"+ district);
-                    }else{
-                        if (!district.toLowerCase().contains("quận")){
-                            district = "Quận"+ addressList[2];
+                        }else{
+                            if (!district.toLowerCase().contains("quận")){
+                                district = "Quận"+ addressList[2];
+                            }
+//                        System.out.println("District :"+ district);
                         }
-//                        System.out.println("District :"+ district);
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
                     //ward
                     String ward = addressList[1].trim();
@@ -168,24 +178,29 @@ public class PhongtotCrawler {
 //                            System.out.println("Ser :" + ser);
 //                        }
                         //longitude, latitude
-                        double latitude = Double.parseDouble(detailElement.getElementsByClass("gllpLatitude").attr("value"));
-                        double longitude = Double.parseDouble(detailElement.getElementsByClass("gllpLongitude").attr("value"));
-//                        System.out.println("Latitude name :"+ latitude);
-//                        System.out.println("Longitude name :"+ longitude);
+                        System.out.println("All :" + addressList[0] + "Dis :" + district + "Ward :" + ward + "Street :" + streetNameAll);
+                        String latLongCrawler = getStreetCrawlerToGetLatLong(addressList[0],district,ward);
+                        System.out.println("Street Crawler :" + latLongCrawler);
+                        String [] latlong = latLongCrawler.split("x");
+
+                        double latitude = Double.parseDouble(latlong[0]);
+                        double longitude = Double.parseDouble(latlong[1]);
                         sample.setLatitude(latitude);
                         sample.setLongitude(longitude);
+
+                        System.out.println("Lat Long : "+ latitude +":"+ longitude);
                         //check insert street ward in db
                         System.out.println("Street ward : "+ streetWard.toString());
                         System.out.println("Result : "+ hostelDAO.checkInsert(streetWard.getWardId(), streetWard.getStreetId()));
                         if(!hostelDAO.checkInsert(streetWard.getWardId(), streetWard.getStreetId())){
-                            hostelDAO.insertStreetWard(streetWard);
+//                            hostelDAO.insertStreetWard(streetWard);
                         }
                         sample.setStreetId(hostelDAO.getStreetWardId(streetWard.getWardId(),streetWard.getStreetId()));
                         //insert sample
                         System.out.println("Sample : "+ sample.toString());
-//                        if(!hostelDAO.checkInsertSample(sample.getPrice(),sample.getSuperficiality(),sample.getStreetId())){
+                        if(!hostelDAO.checkInsertSample(sample.getPrice(),sample.getSuperficiality(),sample.getStreetId())){
 //                            hostelDAO.insertSample(sample);
-//                        }
+                        }
                         System.out.println("-------------------------------");
                     }
                 }
@@ -220,26 +235,57 @@ public class PhongtotCrawler {
         return serviceInteger;
     }
 
-//    public GeoPoint getLocationFromAddress(String strAddress){
-//
-//        Geocoder coder = new Geocoder(this);
-//        List<Address> address;
-//        GeoPoint p1 = null;
-//
-//        try {
-//            address = coder.getFromLocationName(strAddress,5);
-//            if (address==null) {
-//                return null;
+//    public String getStreetCrawlerToGetLatLong(String data, String districtName, String wardName, String streetName){
+//        data = data.toLowerCase();
+//        districtName = districtName.toLowerCase();
+//        wardName = wardName.toLowerCase();
+//        streetName = streetName.toLowerCase();
+//        String streetCrawler = "";
+//        if(data.contains(districtName)||data.contains(districtName.toLowerCase().replace("quận",""))
+//                ||data.contains(districtName.toLowerCase().replace("huyện",""))){
+//            districtName = districtName.replace("quận","").replace("huyện","");
+//            streetCrawler = data.replace(districtName,"").replace("quận","").replace("huyện","");
+//            System.out.println("1 :"+streetCrawler);
+//            data = streetCrawler;
+//            if(data.contains(wardName)||data.contains(wardName.replace("phường",""))){
+//                wardName = wardName.replace("phường","");
+//                streetCrawler = data.replace(wardName,"").replace("phường","");
+//                data = streetCrawler;
+//                System.out.println("2 :"+streetCrawler);
+//                if(data.contains(streetName)||data.contains(streetName.replace("đường",""))){
+//                    streetName =streetName.replace("đường","");
+//                    streetCrawler = data.replace(streetName,"").trim().replace(",","");
+//                    System.out.println("3 :"+streetCrawler);
+//                }
 //            }
-//            Address location=address.get(0);
-//            location.getLatitude();
-//            location.getLongitude();
-//
-//            p1 = new GeoPoint((double) (location.getLatitude() * 1E6),
-//                    (double) (location.getLongitude() * 1E6));
-//
-//            return p1;
 //        }
+//        return streetCrawler;
 //    }
-
+    public String getStreetCrawlerToGetLatLong(String data, String district, String ward) throws Exception{
+        String streetCrawler = data.replaceAll(" ","%20").replaceAll(",","%20");
+        String temp = Normalizer.normalize(streetCrawler, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String convertLanguage = pattern.matcher(temp).replaceAll("").toLowerCase().replaceAll(" ", "-").replaceAll("đ", "d");
+        String urlLatLong = "https://maps.googleapis.com/maps/api/geocode/json?address="+ convertLanguage
+                +"&key=AIzaSyDNBmxVGbZ4Je5XHPRqqaZPmDFKjKPPhXk&fbclid=IwAR3ikgMxRMez3HQa8w6_FHNL0uvW-KVx0n8U30aRRiT_Mx8fk15pk45oCyk";
+        Document mapAddress = Jsoup.connect(urlLatLong).timeout(10000).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64)" +
+                " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").ignoreContentType(true).get();
+        String mapAddressBody = mapAddress.body().text();
+        JSONObject obj = new JSONObject(mapAddressBody);
+        JSONArray arr = obj.getJSONArray("results");
+        String result = "";
+        for(int i = 0; i < arr.length(); i++){
+            String districtEqual = obj.getJSONArray("results").getJSONObject(i).getString("formatted_address").toLowerCase().trim();
+            String districtLower = district.toLowerCase().trim();
+            String wardLower = ward.toLowerCase().trim();
+            if (districtEqual.contains(districtLower)||districtEqual.contains(wardLower)||(districtEqual.contains(districtLower) && districtEqual.contains(wardLower))){
+                String latitude = obj.getJSONArray("results").getJSONObject(i).getJSONObject("geometry").getJSONObject("location").get("lat").toString();
+                String longitude = obj.getJSONArray("results").getJSONObject(i).getJSONObject("geometry").getJSONObject("location").get("lng").toString();
+                result = latitude + "x" + longitude;
+            }else {
+                System.out.println("Fail");
+            }
+        }
+        return result;
+    }
 }

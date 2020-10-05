@@ -34,10 +34,6 @@ public class GetDocumentFromURL {
             PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
             phongtotCrawler.getSampleHostelDataFromPhongTot();
 
-//            SampleHostelDAO hostelDAO = new SampleHostelDAO();
-//            System.out.println(hostelDAO.checkInsertSample(3.3,18.0,8));
-//            System.out.println(hostelDAO.getStreetWardId(279 , 207));
-
             //set default value of UCategory, UType and store in db
 //            GGDAO ggdao = new GGDAO();
 //            ggdao.insertUCategoryList();
@@ -49,7 +45,7 @@ public class GetDocumentFromURL {
 //            GGDAO ggdao = new GGDAO();
 //            List<String> typeList = ggdao.createTypeListToCrawl();
 //            for(String type : typeList){
-//                jsonParser.parseJSONToObject(googleApiCrawler.getGoogleApiInfo(10.8035455,106.6182532,1500000,type));
+//                jsonParser.parseJSONToObject(googleApiCrawler.getGoogleApiInfo(10.8035455,106.6182532,50000,type));
 //                System.out.println("Finish :" + type);
 //            }
 
