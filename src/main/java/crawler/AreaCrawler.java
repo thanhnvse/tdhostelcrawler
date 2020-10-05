@@ -38,7 +38,7 @@ public class AreaCrawler {
                 String districtData = pre + " " + district;
                 id++;
                 districtDTO.setDistrictId(id);
-                districtDTO.setDistrictName(districtData);
+                districtDTO.setDistrictName(districtData.trim());
                 districtDTO.setProvinceId(1);
 //                areaDAO.insertDistrict(districtDTO);
                 //ward
@@ -50,7 +50,7 @@ public class AreaCrawler {
 //                    System.out.println("Ward : "+ ward);
                     Ward wardDTO = new Ward();
                     wardDTO.setWardId(wardId);
-                    wardDTO.setWardName("Phường "+ward);
+                    wardDTO.setWardName("Phường "+ward.trim());
                     wardDTO.setDistrictId(id);
 //                    areaDAO.insertWard(wardDTO);
                 }
@@ -79,7 +79,7 @@ public class AreaCrawler {
                 Street street = new Street();
                 streetId++;
                 street.setStreetId(streetId);
-                street.setStreetName(streetListAll.get(a));
+                street.setStreetName(streetListAll.get(a).trim());
                 areaDAO.insertStreet(street);
             }
         } catch (FileNotFoundException e) {
