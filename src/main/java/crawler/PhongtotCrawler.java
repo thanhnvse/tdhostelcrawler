@@ -9,33 +9,36 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.naming.NamingException;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.text.Normalizer;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import static main.java.constants.StaticDistrict.*;
 
 public class PhongtotCrawler {
-    public List<Sample> getSampleHostelDataFromPhongTot() throws IOException, SQLException, NamingException, ClassNotFoundException {
+    public List<Sample> getSampleHostelDataFromPhongTot(){
         List<Sample> sampleList = new ArrayList<>();
         SampleHostelDAO hostelDAO =  new SampleHostelDAO();
-        List<Street> streetAllList = hostelDAO.getAllStreet();
-        List<Ward> wardList = hostelDAO.getAllWard();
-        List<District> districtList = hostelDAO.getAllDistrict();
-        List<Facility> facilityList = hostelDAO.getAllFacilities();
-        List<Service> serviceList = hostelDAO.getAllServices();
         String mainUrl = "http://phongtot.vn/phong-tro-nha-tro?fill=79";
         try{
-            for(int pageNumber = 0; pageNumber < 1; pageNumber++){
+            List<Street> streetAllList = hostelDAO.getAllStreet();
+            List<Ward> wardList = hostelDAO.getAllWard();
+            List<District> districtList = hostelDAO.getAllDistrict();
+            List<Facility> facilityList = hostelDAO.getAllFacilities();
+            List<Service> serviceList = hostelDAO.getAllServices();
+            for(int pageNumber = 0; pageNumber < 218; pageNumber++){
                 System.out.println("Page :" + pageNumber);
                 Document phongtotDoc = Jsoup.connect(mainUrl+"&page="+pageNumber).timeout(50000).userAgent("Mozilla/5.0 " +
                         "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
                 Elements urlList = phongtotDoc.getElementsByClass("room-item");
                 for(Element sampleElement : urlList){
+                    boolean flag = true;
                     Sample sample = new Sample();
                     StreetWard streetWard =  new StreetWard();
                     //street
@@ -43,20 +46,22 @@ public class PhongtotCrawler {
                     System.out.println("Street Name all: "+ streetName);
                     //split string
                     String[] addressList = streetName.split("-");
-
+//                    System.out.println("Data split : "+ addressList[0] + " * " + addressList[1]+ " * " + addressList[2] );
                     //district
                     int districtId = 0;
                     String district = "";
                     try{
-                        district = addressList[2];
+//                        System.out.println("Size : " +addressList.length);
+                        int districtIndex = 2;
+                        district = addressList[districtIndex];
                         if(district.toLowerCase().contains(BINH_CHANH)|| district.toLowerCase().contains(CAN_GIO)||
                                 district.toLowerCase().contains(CU_CHI)|| district.toLowerCase().contains(HOC_MON)||
                                 district.toLowerCase().contains(NHA_BE)){
-                            district = "Huyện"+ addressList[2];
+                            district = "Huyện"+ addressList[districtIndex];
 //                        System.out.println("District :"+ district);
                         }else{
                             if (!district.toLowerCase().contains("quận")){
-                                district = "Quận"+ addressList[2];
+                                district = "Quận"+ addressList[districtIndex];
                             }
 //                        System.out.println("District :"+ district);
                         }
@@ -64,7 +69,8 @@ public class PhongtotCrawler {
                         e.printStackTrace();
                     }
                     //ward
-                    String ward = addressList[1].trim();
+                    int wardIndex = 1;
+                    String ward = addressList[wardIndex].trim();
                     ward = ward.replaceAll("^(?!00[1-9])0","");
 //                    System.out.println("Ward sau khi regex : "+ ward);
 
@@ -82,16 +88,19 @@ public class PhongtotCrawler {
                                 if(district.trim().equalsIgnoreCase(districtNameToEqual)){
                                     districtId = districtList.get(districtItem).getDistrictId();
                                     if(wardList.get(wardItem).getDistrictId() == districtId){
-                                        System.out.println("District id : "+ districtId);
-                                        System.out.println("Ward id : "+ wardId);
+//                                        System.out.println("District id : "+ districtId);
+//                                        System.out.println("Ward id : "+ wardId);
                                         streetWard.setWardId(wardId);
                                     }
                                 }
                             }
                         }
                     }
+                    if(districtId == 0 || wardId == 0){
+                        flag = false;
+                    }
 
-                    //dien tich
+                    //superficiality
                     String superString = sampleElement.getElementsByClass("pull-left").select("a").text();
                     superString = superString.replaceAll("[^0-9]+", "/");
                     String[] superItem = superString.split("/");
@@ -99,7 +108,7 @@ public class PhongtotCrawler {
 //                    System.out.println("Superficiality: "+ superficiality);
                     sample.setSuperficiality(superficiality);
 
-                    //gia ca
+                    //price
                     String priceString = sampleElement.getElementsByClass("block-room-item-price").select("a").text();
                     priceString = priceString.replaceAll("[^0-9,-\\.]", "");
                     String[] item = priceString.split(",");
@@ -112,6 +121,13 @@ public class PhongtotCrawler {
                     double price = Double.parseDouble(priceStringAll);
 //                    System.out.println("Price: "+price);
                     sample.setPrice(price);
+
+                    //postAt
+                    String postTimeAnalysis = sampleElement.getElementsByClass("block-room-item-info").select("a").get(1).text();
+//                    System.out.println("Post Time Analysis : "+ postTimeAnalysis);
+                    long postAt = getMilisecondFromPostAt(postTimeAnalysis);
+                    sample.setPostAt(postAt);
+//                    System.out.println("Post At : "+ postAt);
 
                     //detail page
                     String detailUrl = sampleElement.getElementsByClass("block-room-item-title").select("a").attr("href");
@@ -135,7 +151,7 @@ public class PhongtotCrawler {
                         for (int streetItem = 0; streetItem < streetAllList.size(); streetItem++){
                             if(streetAllList.get(streetItem).getStreetName().equalsIgnoreCase(streetNameAll)){
                                 streetWard.setStreetId(streetAllList.get(streetItem).getStreetId());
-                                System.out.println("Street id : "+ streetAllList.get(streetItem).getStreetId());
+//                                System.out.println("Street id : "+ streetAllList.get(streetItem).getStreetId());
                                 streetWard.setStreetId(streetAllList.get(streetItem).getStreetId());
                             }
                         }
@@ -170,36 +186,36 @@ public class PhongtotCrawler {
                         List<Integer> serviceInteger = getServiceIdFromServiceName(services, serviceList);
                         sample.setFacilities(facilityInteger);
                         sample.setServices(serviceInteger);
-//                        for(Integer faci : facilityInteger){
-//                            System.out.println("Faci :" + faci);
-//                        }
-//
-//                        for(Integer ser : serviceInteger){
-//                            System.out.println("Ser :" + ser);
-//                        }
                         //longitude, latitude
-                        System.out.println("All :" + addressList[0] + "Dis :" + district + "Ward :" + ward + "Street :" + streetNameAll);
+//                        System.out.println("All :" + addressList[0] + "Dis :" + district + "Ward :" + ward + "Street :" + streetNameAll);
                         String latLongCrawler = getStreetCrawlerToGetLatLong(addressList[0],district,ward);
-                        System.out.println("Street Crawler :" + latLongCrawler);
-                        String [] latlong = latLongCrawler.split("x");
+//                        System.out.println("Street Crawler :" + latLongCrawler);
+                        if(!latLongCrawler.isEmpty()){
+                            String [] latlong = latLongCrawler.split("x");
 
-                        double latitude = Double.parseDouble(latlong[0]);
-                        double longitude = Double.parseDouble(latlong[1]);
-                        sample.setLatitude(latitude);
-                        sample.setLongitude(longitude);
+                            double latitude = Double.parseDouble(latlong[0]);
+                            double longitude = Double.parseDouble(latlong[1]);
+                            sample.setLatitude(latitude);
+                            sample.setLongitude(longitude);
 
-                        System.out.println("Lat Long : "+ latitude +":"+ longitude);
+//                            System.out.println("Lat Long : "+ latitude +":"+ longitude);
+                        }
                         //check insert street ward in db
                         System.out.println("Street ward : "+ streetWard.toString());
-                        System.out.println("Result : "+ hostelDAO.checkInsert(streetWard.getWardId(), streetWard.getStreetId()));
+                        System.out.println("Result check insert street ward (true = ko vao): "+ hostelDAO.checkInsert(streetWard.getWardId(), streetWard.getStreetId()));
                         if(!hostelDAO.checkInsert(streetWard.getWardId(), streetWard.getStreetId())){
-//                            hostelDAO.insertStreetWard(streetWard);
+                            if(flag){
+                               hostelDAO.insertStreetWard(streetWard);
+                            }
                         }
                         sample.setStreetId(hostelDAO.getStreetWardId(streetWard.getWardId(),streetWard.getStreetId()));
                         //insert sample
                         System.out.println("Sample : "+ sample.toString());
+                        System.out.println("flag : "+ flag);
                         if(!hostelDAO.checkInsertSample(sample.getPrice(),sample.getSuperficiality(),sample.getStreetId())){
-//                            hostelDAO.insertSample(sample);
+                            if(flag) {
+                            hostelDAO.insertSample(sample);
+                            }
                         }
                         System.out.println("-------------------------------");
                     }
@@ -235,57 +251,91 @@ public class PhongtotCrawler {
         return serviceInteger;
     }
 
-//    public String getStreetCrawlerToGetLatLong(String data, String districtName, String wardName, String streetName){
-//        data = data.toLowerCase();
-//        districtName = districtName.toLowerCase();
-//        wardName = wardName.toLowerCase();
-//        streetName = streetName.toLowerCase();
-//        String streetCrawler = "";
-//        if(data.contains(districtName)||data.contains(districtName.toLowerCase().replace("quận",""))
-//                ||data.contains(districtName.toLowerCase().replace("huyện",""))){
-//            districtName = districtName.replace("quận","").replace("huyện","");
-//            streetCrawler = data.replace(districtName,"").replace("quận","").replace("huyện","");
-//            System.out.println("1 :"+streetCrawler);
-//            data = streetCrawler;
-//            if(data.contains(wardName)||data.contains(wardName.replace("phường",""))){
-//                wardName = wardName.replace("phường","");
-//                streetCrawler = data.replace(wardName,"").replace("phường","");
-//                data = streetCrawler;
-//                System.out.println("2 :"+streetCrawler);
-//                if(data.contains(streetName)||data.contains(streetName.replace("đường",""))){
-//                    streetName =streetName.replace("đường","");
-//                    streetCrawler = data.replace(streetName,"").trim().replace(",","");
-//                    System.out.println("3 :"+streetCrawler);
-//                }
-//            }
-//        }
-//        return streetCrawler;
-//    }
-    public String getStreetCrawlerToGetLatLong(String data, String district, String ward) throws Exception{
-        String streetCrawler = data.replaceAll(" ","%20").replaceAll(",","%20");
-        String temp = Normalizer.normalize(streetCrawler, Normalizer.Form.NFD);
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        String convertLanguage = pattern.matcher(temp).replaceAll("").toLowerCase().replaceAll(" ", "-").replaceAll("đ", "d");
-        String urlLatLong = "https://maps.googleapis.com/maps/api/geocode/json?address="+ convertLanguage
-                +"&key=AIzaSyDNBmxVGbZ4Je5XHPRqqaZPmDFKjKPPhXk&fbclid=IwAR3ikgMxRMez3HQa8w6_FHNL0uvW-KVx0n8U30aRRiT_Mx8fk15pk45oCyk";
-        Document mapAddress = Jsoup.connect(urlLatLong).timeout(10000).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64)" +
-                " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").ignoreContentType(true).get();
-        String mapAddressBody = mapAddress.body().text();
-        JSONObject obj = new JSONObject(mapAddressBody);
-        JSONArray arr = obj.getJSONArray("results");
+    public String getStreetCrawlerToGetLatLong(String data, String district, String ward){
         String result = "";
-        for(int i = 0; i < arr.length(); i++){
-            String districtEqual = obj.getJSONArray("results").getJSONObject(i).getString("formatted_address").toLowerCase().trim();
-            String districtLower = district.toLowerCase().trim();
-            String wardLower = ward.toLowerCase().trim();
-            if (districtEqual.contains(districtLower)||districtEqual.contains(wardLower)||(districtEqual.contains(districtLower) && districtEqual.contains(wardLower))){
-                String latitude = obj.getJSONArray("results").getJSONObject(i).getJSONObject("geometry").getJSONObject("location").get("lat").toString();
-                String longitude = obj.getJSONArray("results").getJSONObject(i).getJSONObject("geometry").getJSONObject("location").get("lng").toString();
-                result = latitude + "x" + longitude;
-            }else {
-                System.out.println("Fail");
+        try {
+            String streetCrawler = data.replaceAll(" ","%20").replaceAll(",","%20");
+            String temp = Normalizer.normalize(streetCrawler, Normalizer.Form.NFD);
+            Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+            String convertLanguage = pattern.matcher(temp).replaceAll("").toLowerCase().replaceAll(" ", "-").replaceAll("đ", "d");
+            String urlLatLong = "https://maps.googleapis.com/maps/api/geocode/json?address="+ convertLanguage
+                    +"&key=AIzaSyDNBmxVGbZ4Je5XHPRqqaZPmDFKjKPPhXk&fbclid=IwAR3ikgMxRMez3HQa8w6_FHNL0uvW-KVx0n8U30aRRiT_Mx8fk15pk45oCyk";
+            Document mapAddress = Jsoup.connect(urlLatLong).timeout(10000).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64)" +
+                    " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").ignoreContentType(true).get();
+            String mapAddressBody = mapAddress.body().text();
+            JSONObject obj = new JSONObject(mapAddressBody);
+            JSONArray arr = obj.getJSONArray("results");
+            for(int i = 0; i < arr.length(); i++){
+                String districtEqual = obj.getJSONArray("results").getJSONObject(i).getString("formatted_address").toLowerCase().trim();
+//                System.out.println("result districtEqual : "+ districtEqual);
+                String districtLower = district.toLowerCase().trim();
+//                System.out.println("result districtLower : "+ districtLower);
+                String wardLower = ward.toLowerCase().trim();
+//                System.out.println("result wardLower : "+ wardLower);
+//            if (districtEqual.contains(districtLower)||districtEqual.contains(wardLower)||(districtEqual.contains(districtLower) && districtEqual.contains(wardLower))){\
+                if (districtEqual.contains(districtLower)||districtEqual.contains(wardLower)){
+                    String latitude = obj.getJSONArray("results").getJSONObject(i).getJSONObject("geometry").getJSONObject("location").get("lat").toString();
+                    String longitude = obj.getJSONArray("results").getJSONObject(i).getJSONObject("geometry").getJSONObject("location").get("lng").toString();
+                    result = latitude + "x" + longitude;
+//                    System.out.println("result lat long : "+ result);
+                }else {
+//                    System.out.println("Fail");
+                }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return result;
+    }
+
+    public long getMilisecondFromPostAt(String time){
+        String [] timeList = time.split(" ");
+        int number = Integer.parseInt(timeList[0]);
+        String postAt = timeList[1].toLowerCase();
+        long millis = 0;
+        try {
+            if(postAt.toLowerCase().contains("phút")||postAt.toLowerCase().contains("giờ")){
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                LocalDateTime now = LocalDateTime.now();
+                String myDate = dtf.format(now);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                Date date = sdf.parse(myDate);
+                millis = date.getTime();
+//                System.out.println("MiLi : "+ millis);
+            }else{
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                Calendar c1 = Calendar.getInstance();
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                LocalDateTime now = LocalDateTime.now();
+                String myDate = dtf.format(now);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                Date date = sdf.parse(myDate);
+                c1.setTime(date);
+                if((postAt.toLowerCase().contains("ngày"))){
+                    c1.roll(Calendar.DATE, number);
+                    date = sdf.parse(dateFormat.format(c1.getTime()));
+                    millis = date.getTime();
+//                    System.out.println(millis);
+                }else if((postAt.toLowerCase().contains("tuần"))){
+                    c1.roll(Calendar.DATE, 8*number);
+                    date = sdf.parse(dateFormat.format(c1.getTime()));
+                    millis = date.getTime();
+//                    System.out.println(millis);
+                }else if((postAt.toLowerCase().contains("tháng"))){
+                    c1.roll(Calendar.MONTH, number);
+                    date = sdf.parse(dateFormat.format(c1.getTime()));
+                    millis = date.getTime();
+//                    System.out.println(millis);
+                }else if((postAt.toLowerCase().contains("năm"))){
+                    c1.roll(Calendar.YEAR, number);
+                    date = sdf.parse(dateFormat.format(c1.getTime()));
+                    millis = date.getTime();
+//                    System.out.println(millis);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return millis;
     }
 }

@@ -1,9 +1,12 @@
 package main.java;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +24,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.naming.NamingException;
+
 public class GetDocumentFromURL {
 
     public static void main(String[] args){
@@ -31,6 +36,16 @@ public class GetDocumentFromURL {
 //            ggdao.insertEntity();
 
             //get data crawl from phongtot
+//            Timer timer = new Timer ();
+//            TimerTask t = new TimerTask () {
+//                @Override
+//                public void run () {
+//                    PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
+//                    phongtotCrawler.getSampleHostelDataFromPhongTot();
+//                }
+//            };
+//            timer.schedule (t, 0l, 1000*60*60*24);
+
             PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
             phongtotCrawler.getSampleHostelDataFromPhongTot();
 

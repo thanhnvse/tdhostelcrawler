@@ -7,5 +7,17 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://ec2-54-146-91-153.compute-1.amazonaws.com:5432/d14bl687e2t203</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="tdhosteldemo@localhost" uuid="1b822a19-97de-4a07-b53a-5c9b68bf72cb">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5433/tdhosteldemo</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="d8aftg79s0gs6t@ec2-3-216-92-193.compute-1.amazonaws.com" uuid="836f9c2d-0c41-4fee-957b-ac5e92bbb51d">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ec2-3-216-92-193.compute-1.amazonaws.com:5432/d8aftg79s0gs6t</jdbc-url>
+    </data-source>
   </component>
 </project>

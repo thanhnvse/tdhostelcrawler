@@ -19,6 +19,5 @@ public class Sample implements Serializable {
     private double latitude;
     private List<Integer> facilities;
     private List<Integer> services;
-
-
+    private long postAt;
 }
