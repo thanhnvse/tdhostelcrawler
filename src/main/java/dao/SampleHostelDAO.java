@@ -248,4 +248,25 @@ public class SampleHostelDAO {
         }
         return false;
     }
+
+    public List<Ward> getAllWardByDistrictId(int districtId){
+        List<Ward> wardNameList = new ArrayList<>();
+        String query = "SELECT ward_id, ward_name from ward where district_id = " + districtId;
+        try(Connection c = DBUtil.getConnectDB();
+            PreparedStatement ps = c.prepareStatement(query)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int wardId = rs.getInt("ward_id");
+                String wardName = rs.getString("ward_name");
+                Ward ward = new Ward();
+                ward.setWardId(wardId);
+                ward.setWardName(wardName);
+                ward.setDistrictId(districtId);
+                wardNameList.add(ward);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return wardNameList;
+    }
 }
