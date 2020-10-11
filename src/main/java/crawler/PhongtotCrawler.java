@@ -32,7 +32,7 @@ public class PhongtotCrawler {
             List<District> districtList = hostelDAO.getAllDistrict();
             List<Facility> facilityList = hostelDAO.getAllFacilities();
             List<Service> serviceList = hostelDAO.getAllServices();
-            for(int pageNumber = 0; pageNumber < 218; pageNumber++){
+            for(int pageNumber = 22; pageNumber < 218; pageNumber++){
                 System.out.println("Page :" + pageNumber);
                 Document phongtotDoc = Jsoup.connect(mainUrl+"&page="+pageNumber).timeout(50000).userAgent("Mozilla/5.0 " +
                         "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
@@ -51,19 +51,22 @@ public class PhongtotCrawler {
                     int districtId = 0;
                     String district = "";
                     try{
-//                        System.out.println("Size : " +addressList.length);
-                        int districtIndex = 2;
-                        district = addressList[districtIndex];
-                        if(district.toLowerCase().contains(BINH_CHANH)|| district.toLowerCase().contains(CAN_GIO)||
-                                district.toLowerCase().contains(CU_CHI)|| district.toLowerCase().contains(HOC_MON)||
-                                district.toLowerCase().contains(NHA_BE)){
-                            district = "Huyện"+ addressList[districtIndex];
-//                        System.out.println("District :"+ district);
+                        if(addressList.length<2){
+                            flag = false;
                         }else{
-                            if (!district.toLowerCase().contains("quận")){
-                                district = "Quận"+ addressList[districtIndex];
-                            }
+                            int districtIndex = 2;
+                            district = addressList[districtIndex];
+                            if(district.toLowerCase().contains(BINH_CHANH)|| district.toLowerCase().contains(CAN_GIO)||
+                                    district.toLowerCase().contains(CU_CHI)|| district.toLowerCase().contains(HOC_MON)||
+                                    district.toLowerCase().contains(NHA_BE)){
+                                district = "Huyện"+ addressList[districtIndex];
 //                        System.out.println("District :"+ district);
+                            }else{
+                                if (!district.toLowerCase().contains("quận")){
+                                    district = "Quận"+ addressList[districtIndex];
+                                }
+                        System.out.println("District :"+ district);
+                            }
                         }
                     }catch (Exception e){
                         e.printStackTrace();
@@ -77,19 +80,19 @@ public class PhongtotCrawler {
                     if (!ward.toLowerCase().contains("phường")){
                         ward = "Phường "+ ward;
                     }
-//                    System.out.println("Ward :"+ ward);
+                    System.out.println("Ward :"+ ward);
+                    System.out.println("Data : "+ district + " "+ ward );
                     int wardId = 0;
                     for (int wardItem = 0; wardItem < wardList.size(); wardItem++){
                         if(ward.trim().equalsIgnoreCase(wardList.get(wardItem).getWardName().trim())){
                             wardId = wardList.get(wardItem).getWardId();
-                            streetWard.setWardId(wardId);
                             for (int districtItem = 0; districtItem < districtList.size(); districtItem++){
                                 String districtNameToEqual = districtList.get(districtItem).getDistrictName().trim();
                                 if(district.trim().equalsIgnoreCase(districtNameToEqual)){
                                     districtId = districtList.get(districtItem).getDistrictId();
                                     if(wardList.get(wardItem).getDistrictId() == districtId){
-//                                        System.out.println("District id : "+ districtId);
-//                                        System.out.println("Ward id : "+ wardId);
+                                        System.out.println("District id : "+ districtId);
+                                        System.out.println("Ward id : "+ wardId);
                                         streetWard.setWardId(wardId);
                                     }
                                 }
@@ -113,13 +116,16 @@ public class PhongtotCrawler {
                     priceString = priceString.replaceAll("[^0-9,-\\.]", "");
                     String[] item = priceString.split(",");
                     String priceStringAll;
-                    if(item.length == 2){
+                    if(item.length == 2 || item.length == 1){
                         priceStringAll = "0."+item[0];
                     }else{
                         priceStringAll = item[0]+"."+item[1];
                     }
                     double price = Double.parseDouble(priceStringAll);
 //                    System.out.println("Price: "+price);
+                    if(price == 0){
+                        flag = false;
+                    }
                     sample.setPrice(price);
 
                     //postAt
@@ -148,12 +154,16 @@ public class PhongtotCrawler {
                             break;
                         }
                         //equal with street in db
+                        int streetId = 0;
                         for (int streetItem = 0; streetItem < streetAllList.size(); streetItem++){
                             if(streetAllList.get(streetItem).getStreetName().equalsIgnoreCase(streetNameAll)){
-                                streetWard.setStreetId(streetAllList.get(streetItem).getStreetId());
+                                streetId = streetAllList.get(streetItem).getStreetId();
+                                streetWard.setStreetId(streetId);
 //                                System.out.println("Street id : "+ streetAllList.get(streetItem).getStreetId());
-                                streetWard.setStreetId(streetAllList.get(streetItem).getStreetId());
                             }
+                        }
+                        if(streetId == 0){
+                            flag = false;
                         }
                         //facility, service
                         Elements faseList = detailElement.getElementsByClass("type").last().select("a");
