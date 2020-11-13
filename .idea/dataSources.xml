@@ -19,5 +19,11 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://ec2-3-216-92-193.compute-1.amazonaws.com:5432/d8aftg79s0gs6t</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="youthhosteldb_dev@youthhosteldb-dev.postgres.database.azure.com" uuid="69030021-e978-403c-a664-c970d8669be8">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://youthhosteldb-dev.postgres.database.azure.com:5432/youthhosteldb_dev</jdbc-url>
+    </data-source>
   </component>
 </project>

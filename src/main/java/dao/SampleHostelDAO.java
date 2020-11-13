@@ -185,7 +185,7 @@ public class SampleHostelDAO {
     }
 
     public void insertSample(Sample sample) {
-        String query = "INSERT INTO sample (facility_ids, latitude, longitude, price, service_ids, superficiality, street_ward_id) VALUES ( ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO sample (facility_ids, latitude, longitude,post_at, price, service_ids, superficiality, street_ward_id) VALUES ( ?, ?, ?,?, ?, ?, ?, ?)";
         try(Connection c = DBUtil.getConnectDB();
             PreparedStatement ps = c.prepareStatement(query)) {
             List<Integer> facilityInteger = sample.getFacilities();
@@ -194,10 +194,11 @@ public class SampleHostelDAO {
             ps.setArray(1, c.createArrayOf("integer", facilityInteger.toArray()));
             ps.setDouble(2, sample.getLatitude());
             ps.setDouble(3, sample.getLongitude());
-            ps.setDouble(4, sample.getPrice());
-            ps.setArray(5, c.createArrayOf("integer", serviceInteger.toArray()));
-            ps.setDouble(6,sample.getSuperficiality());
-            ps.setInt(7,sample.getStreetId());
+            ps.setLong(4, sample.getPostAt());
+            ps.setDouble(5, sample.getPrice());
+            ps.setArray(6, c.createArrayOf("integer", serviceInteger.toArray()));
+            ps.setDouble(7,sample.getSuperficiality());
+            ps.setInt(8,sample.getStreetId());
 
             int result = ps.executeUpdate();
             // check the affected rows

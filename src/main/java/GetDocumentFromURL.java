@@ -1,19 +1,17 @@
 package main.java;
 
+import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.aspose.pdf.HtmlLoadOptions;
 import main.java.JSONParser.JSONParser;
 import main.java.crawler.AreaCrawler;
 import main.java.crawler.GoogleApiCrawler;
 import main.java.crawler.PhongtotCrawler;
+import main.java.crawler.PhongtotHouseCrawler;
 import main.java.dao.GGDAO;
 import main.java.dao.SampleHostelDAO;
 import main.java.entity.*;
@@ -24,7 +22,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.naming.NamingException;
+import static main.java.constants.LocationLatLong.*;
 
 public class GetDocumentFromURL {
 
@@ -46,29 +48,37 @@ public class GetDocumentFromURL {
 //            };
 //            timer.schedule (t, 0l, 1000*60*60*24);
 
-            PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
-            phongtotCrawler.getSampleHostelDataFromPhongTot();
+//            PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
+//            phongtotCrawler.getSampleHostelDataFromPhongTot();
+
+            PhongtotHouseCrawler phongtotHouseCrawler = new PhongtotHouseCrawler();
+            phongtotHouseCrawler.getSampleHostelDataFromPhongTot();
 
             //set default value of UCategory, UType and store in db
 //            GGDAO ggdao = new GGDAO();
-//            ggdao.insertUCategoryList();
-//            ggdao.insertAUType();
-
-            //crawl and parse nearby utilities using gg map api
-//            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
-//            JSONParser jsonParser = new JSONParser();
-//            GGDAO ggdao = new GGDAO();
-//            List<String> typeList = ggdao.createTypeListToCrawl();
-//            for(String type : typeList){
-//                jsonParser.parseJSONToObject(googleApiCrawler.getGoogleApiInfo(10.8035455,106.6182532,50000,type));
-//                System.out.println("Finish :" + type);
+//            if(ggdao.checkUCategoryEmpty()){
+//                ggdao.insertUCategoryList();
 //            }
-
+//            if(ggdao.checkUTypeEmpty()){
+//                ggdao.insertAUType();
+//            }
+//            //crawl and parse nearby utilities using gg map api
+//            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
+//            List<Location> locationList = ggdao.getLocationList();
+//            List<String> typeList = ggdao.createTypeListToCrawl();
+//            int count = 0;
+//            for(Location locationA : locationList){
+//                for(String type : typeList){
+//                    googleApiCrawler.getGoogleApiInfo(locationA.getLatitude(),locationA.getLongitude(),8000,type);
+//                    System.out.println("Finish :" + type);
+//                }
+//                System.out.println("End location :"+ locationA.getLatitude()+" "+locationA.getLongitude());
+//                System.out.println("count :" + count++);
+//            }
 
             //crawl json file to get district, ward, street
 //            AreaCrawler areaCrawler = new AreaCrawler();
 //            areaCrawler.getSGApiInfo();
-
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -347,4 +357,67 @@ public class GetDocumentFromURL {
         return sampleList;
     }
 
+    public static void sendEmail(){
+        String to = "thanhnv.se@gmail.com";
+
+        // Sender's email ID needs to be mentioned
+//        String from = "winsupersentai@gmail.com";
+//        final String username = "winsupersentai@gmail.com";//change accordingly
+//        final String password = "Thanh71227198";//change accordingly
+        String from = "avenger.youthhostel@gmail.com";
+        final String username = "avenger.youthhostel@gmail.com";
+        final String password = "KieuTrongKhanh!$&1";
+
+        // Assuming you are sending email through relay.jangosmtp.net
+        String host = "smtp.gmail.com";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "465");
+        props.put("mail.smtp.debug", "true");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.fallback", "false");
+
+        // Get the Session object.
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+
+        try {
+            // Create a default MimeMessage object.
+            Message message = new MimeMessage(session);
+
+            // Set From: header field of the header.
+            message.setFrom(new InternetAddress(from));
+
+            // Set To: header field of the header.
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(to));
+
+            // Set Subject: header field
+            message.setSubject("Hợp đồng thuê nhà");
+
+            // Send the actual HTML message, as big as you like
+            File input = new File("D:\\\\capstone\\\\TDHostelGGGAPICrawler\\\\src\\\\main\\\\java\\\\util\\\\contract.html");
+            Document doc = Jsoup.parse(input, "UTF-8", "");
+            String html = doc.toString();
+            message.setContent(html,"text/html; charset=UTF-8");
+            // Send message
+            Transport.send(message);
+
+            System.out.println("Sent message successfully....");
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (IOException ex){
+            ex.printStackTrace();
+        }
+    }
 }
