@@ -21,11 +21,11 @@ import java.util.regex.Pattern;
 
 import static main.java.constants.StaticDistrict.*;
 
-public class PhongtotCrawler {
+public class PhongtotHouseCrawler {
     public List<Sample> getSampleHostelDataFromPhongTot(){
         List<Sample> sampleList = new ArrayList<>();
         SampleHostelDAO hostelDAO =  new SampleHostelDAO();
-        String mainUrl = "http://phongtot.vn/phong-tro-nha-tro?fill=79";
+        String mainUrl = "http://phongtot.vn/nha-nguyen-can?fill=79";
         try{
             List<Street> streetAllList = hostelDAO.getAllStreet();
             List<Ward> wardList = hostelDAO.getAllWard();
@@ -65,7 +65,7 @@ public class PhongtotCrawler {
                                 if (!district.toLowerCase().contains("quận")){
                                     district = "Quận"+ addressList[districtIndex];
                                 }
-                        System.out.println("District :"+ district);
+                                System.out.println("District :"+ district);
                             }
                         }
                     }catch (Exception e){
@@ -224,11 +224,11 @@ public class PhongtotCrawler {
                         System.out.println("Sample : "+ sample.toString());
                         System.out.println("flag : "+ flag);
                         if(flag) {
-                        if(!hostelDAO.checkInsertSample(sample.getPrice(),sample.getSuperficiality(),sample.getStreetId())){
+                            if(!hostelDAO.checkInsertSample(sample.getPrice(),sample.getSuperficiality(),sample.getStreetId())){
 
-                            hostelDAO.insertSample(sample);
+                                hostelDAO.insertSample(sample);
 
-                        }
+                            }
                         }
                         System.out.println("-------------------------------");
                     }
