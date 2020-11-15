@@ -20,4 +20,5 @@ public class Sample implements Serializable {
     private List<Integer> facilities;
     private List<Integer> services;
     private long postAt;
+    private int categoryId;
 }

@@ -110,20 +110,20 @@ public class JSONParser {
                             }
                             System.out.println(utility);
                         }
-                        if (typeId == 6) {
-                            utility.setTypeId(typeId);
-                            //utilityName + address
-                            if(vicinity == ""){
-                                utilityAndVicinity = utilityName;
-                            }else{
-                                utilityAndVicinity = utilityName + " - " + vicinity;
-                            }
-                            utility.setName(utilityAndVicinity);
-                            if (!ggdao.checkInsert(utilityLatitude, utilityLongitude, utilityAndVicinity, typeId)) {
-                                ggdao.insertAUtility(utility);
-                            }
-                            System.out.println(utility);
-                        }
+//                        if (typeId == 6) {
+//                            utility.setTypeId(typeId);
+//                            //utilityName + address
+//                            if(vicinity == ""){
+//                                utilityAndVicinity = utilityName;
+//                            }else{
+//                                utilityAndVicinity = utilityName + " - " + vicinity;
+//                            }
+//                            utility.setName(utilityAndVicinity);
+//                            if (!ggdao.checkInsert(utilityLatitude, utilityLongitude, utilityAndVicinity, typeId)) {
+//                                ggdao.insertAUtility(utility);
+//                            }
+//                            System.out.println(utility);
+//                        }
                         if (typeId == 7) {
                             utility.setTypeId(typeId);
                             //utilityName + address
