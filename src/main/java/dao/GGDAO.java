@@ -49,7 +49,7 @@ public class GGDAO {
 //        uTypeList.add(SCHOOL);
         uTypeList.add(PRIMARY_SCHOOL);
         uTypeList.add(SECONDARY_SCHOOL);
-        uTypeList.add(BUS_STATION);
+//        uTypeList.add(BUS_STATION);
         uTypeList.add(ATM);
         uTypeList.add(BANK);
         uTypeList.add(HOSPITAL);
@@ -92,8 +92,8 @@ public class GGDAO {
             typeId = 4;
         }else if(name.equals(SECONDARY_SCHOOL)){
             typeId = 5;
-        }else if(name.equals(BUS_STATION)){
-            typeId = 6;
+//        }else if(name.equals(BUS_STATION)){
+//            typeId = 6;
         }else if(name.equals(ATM)){
             typeId = 7;
         }else if(name.equals(BANK)){

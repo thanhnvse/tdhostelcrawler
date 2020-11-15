@@ -185,7 +185,7 @@ public class SampleHostelDAO {
     }
 
     public void insertSample(Sample sample) {
-        String query = "INSERT INTO sample (facility_ids, latitude, longitude,post_at, price, service_ids, superficiality, street_ward_id) VALUES ( ?, ?, ?,?, ?, ?, ?, ?)";
+        String query = "INSERT INTO sample (facility_ids, latitude, longitude,post_at, price, service_ids, superficiality, street_ward_id, category_id) VALUES ( ?, ?, ?,?, ?, ?, ?, ?, ?)";
         try(Connection c = DBUtil.getConnectDB();
             PreparedStatement ps = c.prepareStatement(query)) {
             List<Integer> facilityInteger = sample.getFacilities();
@@ -199,6 +199,7 @@ public class SampleHostelDAO {
             ps.setArray(6, c.createArrayOf("integer", serviceInteger.toArray()));
             ps.setDouble(7,sample.getSuperficiality());
             ps.setInt(8,sample.getStreetId());
+            ps.setInt(9,sample.getCategoryId());
 
             int result = ps.executeUpdate();
             // check the affected rows
@@ -269,5 +270,20 @@ public class SampleHostelDAO {
             e.printStackTrace();
         }
         return wardNameList;
+    }
+
+    public long getThelastPostAt (){
+        String query = "select max(post_at) from sample";
+        long postAt = 0;
+        try(Connection c = DBUtil.getConnectDB();
+            PreparedStatement ps = c.prepareStatement(query);
+            ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                postAt = rs.getLong("max");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return postAt;
     }
 }
