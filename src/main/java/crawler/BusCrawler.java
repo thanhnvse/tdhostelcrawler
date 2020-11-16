@@ -3,6 +3,7 @@ package main.java.crawler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import main.java.dao.AreaDAO;
+import main.java.dao.GGDAO;
 import main.java.entity.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,6 +20,7 @@ public class BusCrawler {
     private List<Station> stationFinishList = new ArrayList<>();
 
     public void getBusInfo() {
+        GGDAO ggdao = new GGDAO();
         try {
             String fileName = "data.json";
             BufferedReader in = new BufferedReader(
@@ -103,11 +105,33 @@ public class BusCrawler {
                 }
                 List<String> newList = routeNoList.stream().distinct().collect(Collectors.toList());
                 for (int c = 0; c < newList.size(); c++) {
-                    stationNameComplete = stationNameComplete + "| " + newList.get(c);
+                    stationNameComplete = stationNameComplete + " | " + newList.get(c);
                 }
                 stationFinishList.get(a).setStationName(stationNameComplete);
             }
-            System.out.println(stationFinishList);
+//            System.out.println(stationFinishList);
+
+            //insert bus
+            for(Station station : stationFinishList){
+                if (!ggdao.checkInsert(station.getLatitude(), station.getLongitude(), station.getStationName(), station.getUTypeId())) {
+                    Utility utility = new Utility();
+                    utility.setLatitude(station.getLatitude());
+                    utility.setLongitude(station.getLongitude());
+                    utility.setName(station.getStationName());
+                    utility.setTypeId(station.getUTypeId());
+                    ggdao.insertAUtility(utility);
+                }
+            }
+//            for(int d = 1710; d < 1711; d++){
+//                if (!ggdao.checkInsert(stationFinishList.get(d).getLatitude(), stationFinishList.get(d).getLongitude(), stationFinishList.get(d).getStationName(), stationFinishList.get(d).getUTypeId())) {
+//                    Utility utility = new Utility();
+//                    utility.setLatitude(stationFinishList.get(d).getLatitude());
+//                    utility.setLongitude(stationFinishList.get(d).getLongitude());
+//                    utility.setName(stationFinishList.get(d).getStationName());
+//                    utility.setTypeId(stationFinishList.get(d).getUTypeId());
+//                    ggdao.insertAUtility(utility);
+//                }
+//            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

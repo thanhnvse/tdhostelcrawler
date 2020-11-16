@@ -43,28 +43,31 @@ public class GetDocumentFromURL {
 //            System.out.println("-------------------------------------------------");
 //            PhongtotHouseCrawler phongtotHouseCrawler = new PhongtotHouseCrawler();
 //            phongtotHouseCrawler.getSampleHostelDataFromPhongTot();
+            MogiCrawler mogiCrawler = new MogiCrawler();
+            mogiCrawler.getSampleHostelDataFromMogi();
+
 
             //set default value of UCategory, UType and store in db
-            GGDAO ggdao = new GGDAO();
-            if(ggdao.checkUCategoryEmpty()){
-                ggdao.insertUCategoryList();
-            }
-            if(ggdao.checkUTypeEmpty()){
-                ggdao.insertAUType();
-            }
-            //crawl and parse nearby utilities using gg map api
-            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
-            List<Location> locationList = ggdao.getLocationList();
-            List<String> typeList = ggdao.createTypeListToCrawl();
-            int count = 0;
-            for(Location locationA : locationList){
-                for(String type : typeList){
-                    googleApiCrawler.getGoogleApiInfo(locationA.getLatitude(),locationA.getLongitude(),8000,type);
-                    System.out.println("Finish :" + type);
-                }
-                System.out.println("End location :"+ locationA.getLatitude()+" "+locationA.getLongitude());
-                System.out.println("count :" + count++);
-            }
+//            GGDAO ggdao = new GGDAO();
+//            if(ggdao.checkUCategoryEmpty()){
+//                ggdao.insertUCategoryList();
+//            }
+//            if(ggdao.checkUTypeEmpty()){
+//                ggdao.insertAUType();
+//            }
+//            //crawl and parse nearby utilities using gg map api
+//            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
+//            List<Location> locationList = ggdao.getLocationList();
+//            List<String> typeList = ggdao.createTypeListToCrawl();
+//            int count = 0;
+//            for(Location locationA : locationList){
+//                for(String type : typeList){
+//                    googleApiCrawler.getGoogleApiInfo(locationA.getLatitude(),locationA.getLongitude(),8000,type);
+//                    System.out.println("Finish :" + type);
+//                }
+//                System.out.println("End location :"+ locationA.getLatitude()+" "+locationA.getLongitude());
+//                System.out.println("count :" + count++);
+//            }
 
             //crawl json file to get district, ward, street
 //            AreaCrawler areaCrawler = new AreaCrawler();
