@@ -286,4 +286,18 @@ public class SampleHostelDAO {
         }
         return postAt;
     }
+
+    public boolean checkSampleEmpty(){
+        String query = "SELECT * from sample";
+        try (Connection c = DBUtil.getConnectDB();
+             Statement ps = c.createStatement();
+             ResultSet rs = ps.executeQuery(query)){
+            if(rs.next() == false){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

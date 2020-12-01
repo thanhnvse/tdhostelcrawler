@@ -46,9 +46,9 @@ public class PhongtotHouseCrawler {
                     String postTimeAnalysis = sampleElement.getElementsByClass("block-room-item-info").select("a").get(1).text();
                     long postAt = getMilisecondFromPostAt(postTimeAnalysis);
                     //the last post at
-                    long lastPostAt = hostelDAO.getThelastPostAt();
-                    System.out.println("postAt : " + postAt + " last :" + lastPostAt);
-                    if (postAt >= lastPostAt) {
+//                    long lastPostAt = hostelDAO.getThelastPostAt();
+//                    System.out.println("postAt : " + postAt + " last :" + lastPostAt);
+//                    if (postAt >= lastPostAt) {
 
                         //street
                         String streetName = sampleElement.getElementsByClass("block-room-item-address").select("a").text();
@@ -240,14 +240,14 @@ public class PhongtotHouseCrawler {
                             }
                             System.out.println("-------------------------------");
                         }
-                    } else {
-                        endFlag = true;
-                        break;
-                    }
+//                    }else {
+//                        endFlag = true;
+//                        break;
+//                    }
                 }
-                if (endFlag) {
-                    break;
-                }
+//                if (endFlag) {
+//                    break;
+//                }
             }
         } catch (Exception e) {
             e.printStackTrace();

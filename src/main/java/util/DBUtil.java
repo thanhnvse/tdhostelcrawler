@@ -23,17 +23,23 @@ public class DBUtil {
 //            props.setProperty("password","748159263");
 //            conn = DriverManager.getConnection(url, props);
             //db dev server
-            String url = "jdbc:postgresql://ec2-3-216-92-193.compute-1.amazonaws.com:5432/d8aftg79s0gs6t?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
-            Properties props = new Properties();
-            props.setProperty("user","cnsgttdjfqnozh");
-            props.setProperty("password","8fabab17d81a60c9f05f205e877ca7dcfad4125c56a87425dfdcbedfbf254fd9");
-            conn = DriverManager.getConnection(url, props);
+//            String url = "jdbc:postgresql://ec2-3-216-92-193.compute-1.amazonaws.com:5432/d8aftg79s0gs6t?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
+//            Properties props = new Properties();
+//            props.setProperty("user","cnsgttdjfqnozh");
+//            props.setProperty("password","8fabab17d81a60c9f05f205e877ca7dcfad4125c56a87425dfdcbedfbf254fd9");
+//            conn = DriverManager.getConnection(url, props);
             // dev azure
 //            String url = "jdbc:postgresql://youthhosteldb-dev.postgres.database.azure.com:5432/youthhosteldb_dev?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
 //            Properties props = new Properties();
 //            props.setProperty("user","youthhostel@youthhosteldb-dev");
 //            props.setProperty("password","KieuTrongKhanh!$&");
 //            conn = DriverManager.getConnection(url, props);
+            // dev azure test street ward
+            String url = "jdbc:postgresql://youthhosteldb.postgres.database.azure.com:5432/youthhosteldb?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
+            Properties props = new Properties();
+            props.setProperty("user","youthhostel@youthhosteldb");
+            props.setProperty("password","KieuTrongKhanh!$&");
+            conn = DriverManager.getConnection(url, props);
         }catch(SQLException e){
             System.err.println(e.getMessage());
         }

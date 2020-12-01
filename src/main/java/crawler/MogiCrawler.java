@@ -33,7 +33,7 @@ public class MogiCrawler {
             List<District> districtList = hostelDAO.getAllDistrict();
             List<Facility> facilityList = hostelDAO.getAllFacilities();
             List<Service> serviceList = hostelDAO.getAllServices();
-            for (int pageNumber = 4; pageNumber < 5; pageNumber++) {
+            for (int pageNumber = 0; pageNumber < 16; pageNumber++) {
                 System.out.println("Page :" + pageNumber);
                 Document mogiDoc = Jsoup.connect(mainUrl + pageNumber).timeout(50000).userAgent("Mozilla/5.0 " +
                         "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
@@ -43,7 +43,8 @@ public class MogiCrawler {
                     boolean flag = true;
                     if (sampleElement.hasClass("bath") || sampleElement.hasClass("bed") || sampleElement.hasClass("land")) {
                         flag = false;
-                    } else {
+                    }
+                    else {
                         System.out.println("-----------------------");
                         System.out.println("count : " + count++);
                         Sample sample = new Sample();
@@ -173,9 +174,9 @@ public class MogiCrawler {
                             String postTimeAnalysis = sampleElement.getElementsByClass("prop-created").text();
                             postTimeAnalysis = postTimeAnalysis.replace("Ngày đăng:", "");
                             postTimeAnalysis = postTimeAnalysis.trim();
-                            System.out.println("Post Time Analysis : " + postTimeAnalysis);
                             long postAt = getMilisecondFromPostAt(postTimeAnalysis);
                             sample.setPostAt(postAt);
+                            System.out.println("Post Time Analysis : " + postTimeAnalysis);
                             System.out.println("Post At : " + postAt);
 
                             //longitude, latitude
@@ -266,11 +267,10 @@ public class MogiCrawler {
                             sample.setServices(serviceInteger);
 
                             //check insert street ward in db
-                            System.out.println("Street ward : " + streetWard.toString());
                             System.out.println("Result check insert street ward (true = ko vao): " + hostelDAO.checkInsert(streetWard.getWardId(), streetWard.getStreetId()));
                             if (flag) {
                                 if (!hostelDAO.checkInsert(streetWard.getWardId(), streetWard.getStreetId())) {
-//                                    hostelDAO.insertStreetWard(streetWard);
+                                    hostelDAO.insertStreetWard(streetWard);
                                 }
                             }
                             sample.setStreetId(hostelDAO.getStreetWardId(streetWard.getWardId(), streetWard.getStreetId()));
@@ -280,8 +280,7 @@ public class MogiCrawler {
                             System.out.println("flag : " + flag);
                             if (flag) {
                                 if (!hostelDAO.checkInsertSample(sample.getPrice(), sample.getSuperficiality(), sample.getStreetId())) {
-//                                    hostelDAO.insertSample(sample);
-                                    System.out.println("insert dc");
+                                    hostelDAO.insertSample(sample);
                                 }
                             }
                             System.out.println("-------------------------------");
