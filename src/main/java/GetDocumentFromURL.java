@@ -7,9 +7,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import main.java.crawler.*;
+import main.java.dao.AreaDAO;
 import main.java.dao.GGDAO;
 import main.java.dao.SampleHostelDAO;
 import main.java.entity.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,10 +25,9 @@ public class GetDocumentFromURL {
 
     public static void main(String[] args){
         try{
-//            GetDocumentFromURL getDocumentFromURL = new GetDocumentFromURL();
-//            getDocumentFromURL.thuenhatro360();
-//            GGDAO ggdao = new GGDAO();
-//            ggdao.insertEntity();
+            //crawl json file to get district, ward, street
+//            AreaCrawler areaCrawler = new AreaCrawler();
+//            areaCrawler.getSGApiInfo();
 
             //get data crawl from phongtot
 //            Timer timer = new Timer ();
@@ -38,13 +40,27 @@ public class GetDocumentFromURL {
 //            };
 //            timer.schedule (t, 0l, 1000*60*60*24);
 
-//            PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
-//            phongtotCrawler.getSampleHostelDataFromPhongTot();
-//            System.out.println("-------------------------------------------------");
-//            PhongtotHouseCrawler phongtotHouseCrawler = new PhongtotHouseCrawler();
-//            phongtotHouseCrawler.getSampleHostelDataFromPhongTot();
-            MogiCrawler mogiCrawler = new MogiCrawler();
-            mogiCrawler.getSampleHostelDataFromMogi();
+            //crawl sample
+//            SampleHostelDAO hostelDAO = new SampleHostelDAO();
+//            if(hostelDAO.checkSampleEmpty()) {
+//                PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
+//                phongtotCrawler.getSampleHostelDataFromPhongTot();
+//                System.out.println("-------------------------------------------------");
+//                PhongtotHouseCrawler phongtotHouseCrawler = new PhongtotHouseCrawler();
+//                phongtotHouseCrawler.getSampleHostelDataFromPhongTot();
+//                System.out.println("-------------------------------------------------");
+//                MogiCrawler mogiCrawler = new MogiCrawler();
+//                mogiCrawler.getSampleHostelDataFromMogi();
+//            }else{
+//                PhongtotUCrawler phongtotUCrawler = new PhongtotUCrawler();
+//                phongtotUCrawler.getSampleHostelDataFromPhongTot();
+//                System.out.println("-------------------------------------------------");
+//                PhongtotHouseUCrawler phongtotHouseUCrawler = new PhongtotHouseUCrawler();
+//                phongtotHouseUCrawler.getSampleHostelDataFromPhongTot();
+//                System.out.println("-------------------------------------------------");
+//                MogiUCrawler mogiUCrawler = new MogiUCrawler();
+//                mogiUCrawler.getSampleHostelDataFromMogi();
+//            }
 
 
             //set default value of UCategory, UType and store in db
@@ -69,13 +85,10 @@ public class GetDocumentFromURL {
 //                System.out.println("count :" + count++);
 //            }
 
-            //crawl json file to get district, ward, street
-//            AreaCrawler areaCrawler = new AreaCrawler();
-//            areaCrawler.getSGApiInfo();
-
             //crawl bus station
 //            BusCrawler busCrawler = new BusCrawler();
 //            busCrawler.getBusInfo();
+
         }catch (Exception e){
             e.printStackTrace();
         }

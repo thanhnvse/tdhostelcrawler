@@ -61,4 +61,46 @@ public class AreaDAO {
             e.printStackTrace();
         }
     }
+
+    public boolean checkDistrictEmpty(){
+        String query = "SELECT * from district";
+        try (Connection c = DBUtil.getConnectDB();
+             Statement ps = c.createStatement();
+             ResultSet rs = ps.executeQuery(query)){
+            if(rs.next() == false){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean checkWardEmpty(){
+        String query = "SELECT * from ward";
+        try (Connection c = DBUtil.getConnectDB();
+             Statement ps = c.createStatement();
+             ResultSet rs = ps.executeQuery(query)){
+            if(rs.next() == false){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean checkStreetEmpty(){
+        String query = "SELECT * from street";
+        try (Connection c = DBUtil.getConnectDB();
+             Statement ps = c.createStatement();
+             ResultSet rs = ps.executeQuery(query)){
+            if(rs.next() == false){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

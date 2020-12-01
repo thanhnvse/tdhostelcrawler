@@ -43,7 +43,8 @@ public class MogiCrawler {
                     boolean flag = true;
                     if (sampleElement.hasClass("bath") || sampleElement.hasClass("bed") || sampleElement.hasClass("land")) {
                         flag = false;
-                    } else {
+                    }
+                    else {
                         System.out.println("-----------------------");
                         System.out.println("count : " + count++);
                         Sample sample = new Sample();
@@ -173,9 +174,9 @@ public class MogiCrawler {
                             String postTimeAnalysis = sampleElement.getElementsByClass("prop-created").text();
                             postTimeAnalysis = postTimeAnalysis.replace("Ngày đăng:", "");
                             postTimeAnalysis = postTimeAnalysis.trim();
-                            System.out.println("Post Time Analysis : " + postTimeAnalysis);
                             long postAt = getMilisecondFromPostAt(postTimeAnalysis);
                             sample.setPostAt(postAt);
+                            System.out.println("Post Time Analysis : " + postTimeAnalysis);
                             System.out.println("Post At : " + postAt);
 
                             //longitude, latitude
