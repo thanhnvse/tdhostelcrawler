@@ -1,5 +1,6 @@
 package main.java.crawler;
 
+import main.java.JSONParser.JacksonObj;
 import main.java.dao.SampleHostelDAO;
 import main.java.entity.*;
 import org.json.JSONArray;
@@ -21,24 +22,25 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static main.java.constants.StaticDistrict.*;
+import static main.java.constants.StaticUrl.*;
 
 public class MogiUCrawler {
     public List<Sample> getSampleHostelDataFromMogi() {
         List<Sample> sampleList = new ArrayList<>();
         SampleHostelDAO hostelDAO = new SampleHostelDAO();
         boolean endFlag = false;
-        String mainUrl = "https://mogi.vn/thue-phong-tro-o-ghep?cp=";
         try {
             List<Street> streetAllList = hostelDAO.getAllStreet();
             List<Ward> wardList = hostelDAO.getAllWard();
             List<District> districtList = hostelDAO.getAllDistrict();
             List<Facility> facilityList = hostelDAO.getAllFacilities();
             List<Service> serviceList = hostelDAO.getAllServices();
+            JacksonObj jacksonObj = new JacksonObj();
             for (int pageNumber = 0; pageNumber < 16; pageNumber++) {
                 System.out.println("Page :" + pageNumber);
-                Document mogiDoc = Jsoup.connect(mainUrl + pageNumber).timeout(50000).userAgent("Mozilla/5.0 " +
+                Document mogiDoc = Jsoup.connect(MOGI +"?cp="+ pageNumber).timeout(50000).userAgent("Mozilla/5.0 " +
                         "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
-                Elements urlList = mogiDoc.select(".props li");
+                Elements urlList = mogiDoc.select(jacksonObj.readYamlForMogi().getUrlList());
                 int count = 1;
                 for (Element sampleElement : urlList) {
                     boolean flag = true;
@@ -47,7 +49,7 @@ public class MogiUCrawler {
                     }
                     else {
                         //postAt
-                        String postTimeAnalysis = sampleElement.getElementsByClass("prop-created").text();
+                        String postTimeAnalysis = sampleElement.select(jacksonObj.readYamlForMogi().getPostTimeAnalysis()).text();
                         postTimeAnalysis = postTimeAnalysis.replace("Ngày đăng:", "");
                         postTimeAnalysis = postTimeAnalysis.trim();
                         long postAt = getMilisecondFromPostAt(postTimeAnalysis);
@@ -60,11 +62,11 @@ public class MogiUCrawler {
                             System.out.println("count : " + count++);
                             Sample sample = new Sample();
                             StreetWard streetWard = new StreetWard();
-                            String name = sampleElement.getElementsByClass("link-overlay").text().toLowerCase();
+                            String name = sampleElement.select(jacksonObj.readYamlForMogi().getName()).text().toLowerCase();
                             System.out.println(name);
                             if (!name.contains("căn hộ")) {
                                 //street
-                                String streetName = sampleElement.getElementsByClass("prop-addr").text();
+                                String streetName = sampleElement.select(jacksonObj.readYamlForMogi().getStreetName()).text();
                                 System.out.println("Street Name all: " + streetName);
                                 //split string
                                 String[] addressList = streetName.split(",");
@@ -149,7 +151,7 @@ public class MogiUCrawler {
                                 }
                                 System.out.println("Street ward : " + streetWard.toString());
                                 //superficiality
-                                String superString = sampleElement.getElementsByClass("land").text();
+                                String superString = sampleElement.select(jacksonObj.readYamlForMogi().getSuperString()).text();
                                 superString = superString.replaceAll("[^0-9]+", "/");
                                 String[] superItem = superString.split("/");
                                 double superficiality = Double.parseDouble(superItem[0]);
@@ -157,7 +159,7 @@ public class MogiUCrawler {
                                 sample.setSuperficiality(superficiality);
 
                                 //price
-                                String priceString = sampleElement.getElementsByClass("price").text();
+                                String priceString = sampleElement.select(jacksonObj.readYamlForMogi().getPriceString()).text();
                                 String priceStringAll = "";
                                 if (priceString.contains("triệu") && !priceString.contains("nghìn")) {
                                     priceString = priceString.replaceAll("[^0-9]+", "/");
@@ -201,10 +203,10 @@ public class MogiUCrawler {
                                 }
 
                                 //detail page
-                                String detailUrl = sampleElement.getElementsByClass("prop-title").select("a").attr("href");
+                                String detailUrl = sampleElement.select(jacksonObj.readYamlForMogi().getDetailUrl()).attr("href");
                                 Document detailDoc = Jsoup.connect(detailUrl).timeout(10000).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64)" +
                                         " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
-                                String description = detailDoc.getElementsByClass("prop-info-content").text().toLowerCase();
+                                String description = detailDoc.select(jacksonObj.readYamlForMogi().getDescription()).text().toLowerCase();
                                 System.out.println("Mô tả: " + description);
                                 List<String> facilities = new ArrayList<>();
                                 List<String> services = new ArrayList<>();

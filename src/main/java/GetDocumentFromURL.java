@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import main.java.JSONParser.JacksonObj;
 import main.java.crawler.*;
 import main.java.dao.AreaDAO;
 import main.java.dao.GGDAO;
@@ -26,68 +27,66 @@ public class GetDocumentFromURL {
     public static void main(String[] args){
         try{
             //crawl json file to get district, ward, street
-//            AreaCrawler areaCrawler = new AreaCrawler();
-//            areaCrawler.getSGApiInfo();
+            AreaCrawler areaCrawler = new AreaCrawler();
+            areaCrawler.getSGAPIInFor();
 
             //get data crawl from phongtot
-//            Timer timer = new Timer ();
-//            TimerTask t = new TimerTask () {
-//                @Override
-//                public void run () {
-//                    PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
-//                    phongtotCrawler.getSampleHostelDataFromPhongTot();
-//                }
-//            };
-//            timer.schedule (t, 0l, 1000*60*60*24);
-
-            //crawl sample
-//            SampleHostelDAO hostelDAO = new SampleHostelDAO();
-//            if(hostelDAO.checkSampleEmpty()) {
-//                PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
-//                phongtotCrawler.getSampleHostelDataFromPhongTot();
-//                System.out.println("-------------------------------------------------");
-//                PhongtotHouseCrawler phongtotHouseCrawler = new PhongtotHouseCrawler();
-//                phongtotHouseCrawler.getSampleHostelDataFromPhongTot();
-//                System.out.println("-------------------------------------------------");
-//                MogiCrawler mogiCrawler = new MogiCrawler();
-//                mogiCrawler.getSampleHostelDataFromMogi();
-//            }else{
-//                PhongtotUCrawler phongtotUCrawler = new PhongtotUCrawler();
-//                phongtotUCrawler.getSampleHostelDataFromPhongTot();
-//                System.out.println("-------------------------------------------------");
-//                PhongtotHouseUCrawler phongtotHouseUCrawler = new PhongtotHouseUCrawler();
-//                phongtotHouseUCrawler.getSampleHostelDataFromPhongTot();
-//                System.out.println("-------------------------------------------------");
-//                MogiUCrawler mogiUCrawler = new MogiUCrawler();
-//                mogiUCrawler.getSampleHostelDataFromMogi();
-//            }
-
+            SampleHostelDAO hostelDAO = new SampleHostelDAO();
+            Timer timer = new Timer ();
+            TimerTask t = new TimerTask () {
+                @Override
+                public void run () {
+                    //crawl sample
+                    if(hostelDAO.checkSampleEmpty()) {
+                        PhongtotCrawler phongtotCrawler = new PhongtotCrawler();
+                        phongtotCrawler.getSampleHostelDataFromPhongTot();
+                        System.out.println("-------------------------------------------------");
+                        PhongtotHouseCrawler phongtotHouseCrawler = new PhongtotHouseCrawler();
+                        phongtotHouseCrawler.getSampleHostelDataFromPhongTot();
+                        System.out.println("-------------------------------------------------");
+                        MogiCrawler mogiCrawler = new MogiCrawler();
+                        mogiCrawler.getSampleHostelDataFromMogi();
+                    }else{
+                        PhongtotUCrawler phongtotUCrawler = new PhongtotUCrawler();
+                        phongtotUCrawler.getSampleHostelDataFromPhongTot();
+                        System.out.println("-------------------------------------------------");
+                        PhongtotHouseUCrawler phongtotHouseUCrawler = new PhongtotHouseUCrawler();
+                        phongtotHouseUCrawler.getSampleHostelDataFromPhongTot();
+                        System.out.println("-------------------------------------------------");
+                        MogiUCrawler mogiUCrawler = new MogiUCrawler();
+                        mogiUCrawler.getSampleHostelDataFromMogi();
+                    }
+                }
+            };
+            timer.schedule (t, getTomorrowMorning0AM());
 
             //set default value of UCategory, UType and store in db
-//            GGDAO ggdao = new GGDAO();
-//            if(ggdao.checkUCategoryEmpty()){
-//                ggdao.insertUCategoryList();
-//            }
-//            if(ggdao.checkUTypeEmpty()){
-//                ggdao.insertAUType();
-//            }
-//            //crawl and parse nearby utilities using gg map api
-//            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
-//            List<Location> locationList = ggdao.getLocationList();
-//            List<String> typeList = ggdao.createTypeListToCrawl();
-//            int count = 0;
-//            for(Location locationA : locationList){
-//                for(String type : typeList){
-//                    googleApiCrawler.getGoogleApiInfo(locationA.getLatitude(),locationA.getLongitude(),8000,type);
-//                    System.out.println("Finish :" + type);
-//                }
-//                System.out.println("End location :"+ locationA.getLatitude()+" "+locationA.getLongitude());
-//                System.out.println("count :" + count++);
-//            }
+            GGDAO ggdao = new GGDAO();
+            if(ggdao.checkUCategoryEmpty()){
+                ggdao.insertUCategoryList();
+            }
+            if(ggdao.checkUTypeEmpty()){
+                ggdao.insertAUType();
+            }
+            //crawl and parse nearby utilities using gg map api
+            GoogleApiCrawler googleApiCrawler = new GoogleApiCrawler();
+            List<Location> locationList = ggdao.getLocationList();
+            List<String> typeList = ggdao.createTypeListToCrawl();
+            int count = 0;
+            for(Location locationA : locationList){
+                for(String type : typeList){
+                    googleApiCrawler.getGoogleApiInfo(locationA.getLatitude(),locationA.getLongitude(),8000,type);
+                    System.out.println("Finish :" + type);
+                }
+                System.out.println("End location :"+ locationA.getLatitude()+" "+locationA.getLongitude());
+                System.out.println("count :" + count++);
+            }
 
             //crawl bus station
-//            BusCrawler busCrawler = new BusCrawler();
-//            busCrawler.getBusInfo();
+            if(ggdao.checkBusEmpty()) {
+                BusCrawler busCrawler = new BusCrawler();
+                busCrawler.getBusInfo();
+            }
 
         }catch (Exception e){
             e.printStackTrace();
@@ -365,5 +364,13 @@ public class GetDocumentFromURL {
 
         }
         return sampleList;
+    }
+
+    public static Date getTomorrowMorning0AM(){
+
+        Date date0am = new java.util.Date();
+        date0am.setHours(0);
+        date0am.setMinutes(0);
+        return date0am;
     }
 }

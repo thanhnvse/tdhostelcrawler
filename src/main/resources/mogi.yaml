@@ -1,0 +1,8 @@
+urlList: ".props li"
+name: "h2.prop-title > a"
+streetName: "div.prop-addr"
+superString: "ul.prop-attr > li.land"
+priceString: "div.price"
+postTimeAnalysis: "div.prop-created"
+detailUrl: "h2.prop-title > a.link-overlay"
+description: "div.prop-info-content"
