@@ -436,4 +436,18 @@ public class GGDAO {
         }
         return check;
     }
+
+    public boolean checkBusEmpty(){
+        String query = "SELECT * from utility where u_type_id = 6";
+        try (Connection c = DBUtil.getConnectDB();
+             Statement ps = c.createStatement();
+             ResultSet rs = ps.executeQuery(query)){
+            if(rs.next() == false){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
