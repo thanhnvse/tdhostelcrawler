@@ -6,6 +6,7 @@ import main.java.dto.FaSeIdsDTO;
 import main.java.entity.*;
 import main.java.process.MogiDataProcess;
 import main.java.process.MogiProcess;
+import main.java.process.SampleProcess;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,12 +14,15 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MogiCrawler {
     public List<Sample> getSampleHostelDataFromMogi() {
         List<Sample> sampleList = new ArrayList<>();
         SampleHostelDAO hostelDAO = new SampleHostelDAO();
         MogiProcess mogiProcess = new MogiProcess();
+        SampleProcess sampleProcess = new SampleProcess();
         MogiDataProcess mogiDataProcess = new MogiDataProcess();
         try {
             List<Street> streetAllList = hostelDAO.getAllStreet();
@@ -68,9 +72,9 @@ public class MogiCrawler {
                             sample.setPrice(price);
                             String postTimeAnalysis = sampleElement.select(jacksonObj.readYamlForMogi().getPostTimeAnalysis()).text();
                             postTimeAnalysis = mogiDataProcess.getPostAt(postTimeAnalysis);
-                            long postAt = mogiProcess.getMilisecondFromPostAt(postTimeAnalysis);
+                            long postAt = mogiProcess.getMillisecondFromPostAt(postTimeAnalysis);
                             sample.setPostAt(postAt);
-                            String latLongCrawler = mogiProcess.getStreetCrawlerToGetLatLong(addressList[0], district
+                            String latLongCrawler = sampleProcess.getStreetCrawlerToGetLatLong(addressList[0], district
                                     ,mogiDataProcess.getWardIdAndDistrictId(addressList,wardList,districtList,district).getWard());
                             if (!latLongCrawler.isEmpty()) {
                                 sample.setLatitude(mogiDataProcess.getLatitude(latLongCrawler));
@@ -100,7 +104,7 @@ public class MogiCrawler {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(MogiCrawler.class.getName()).log(Level.SEVERE, null, e);
         }
         return sampleList;
     }

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AreaProcess {
@@ -24,7 +25,7 @@ public class AreaProcess {
             districtList = obj.getJSONArray("district");
 
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(AreaProcess.class.getName()).log(Level.SEVERE, null, e);
         }
         return districtList;
     }

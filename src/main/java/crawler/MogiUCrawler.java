@@ -5,6 +5,7 @@ import main.java.dao.SampleHostelDAO;
 import main.java.entity.*;
 import main.java.process.MogiDataProcess;
 import main.java.process.MogiProcess;
+import main.java.process.SampleProcess;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static main.java.constants.StaticDistrict.*;
@@ -31,6 +34,7 @@ public class MogiUCrawler {
         List<Sample> sampleList = new ArrayList<>();
         SampleHostelDAO hostelDAO = new SampleHostelDAO();
         MogiProcess mogiProcess = new MogiProcess();
+        SampleProcess sampleProcess = new SampleProcess();
         MogiDataProcess mogiDataProcess = new MogiDataProcess();
         boolean endFlag = false;
         try {
@@ -41,9 +45,7 @@ public class MogiUCrawler {
             List<Service> serviceList = hostelDAO.getAllServices();
             JacksonObj jacksonObj = new JacksonObj();
             for (int pageNumber = 0; pageNumber < 16; pageNumber++) {
-                Document mogiDoc = Jsoup.connect(MOGI +"?cp="+ pageNumber).timeout(50000).userAgent("Mozilla/5.0 " +
-                        "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
-                Elements urlList = mogiDoc.select(jacksonObj.readYamlForMogi().getUrlList());
+                Elements urlList = mogiDataProcess.readUrlList(pageNumber);
                 int count = 1;
                 for (Element sampleElement : urlList) {
                     boolean flag = true;
@@ -53,7 +55,7 @@ public class MogiUCrawler {
                     else {
                         String postTimeAnalysis = sampleElement.select(jacksonObj.readYamlForMogi().getPostTimeAnalysis()).text();
                         postTimeAnalysis = mogiDataProcess.getPostAt(postTimeAnalysis);
-                        long postAt = mogiProcess.getMilisecondFromPostAt(postTimeAnalysis);
+                        long postAt = mogiProcess.getMillisecondFromPostAt(postTimeAnalysis);
                         long lastPostAt = hostelDAO.getThelastPostAt();
                         if (postAt >= lastPostAt) {
                             Sample sample = new Sample();
@@ -90,7 +92,7 @@ public class MogiUCrawler {
                                 }
                                 sample.setPrice(price);
                                 sample.setPostAt(postAt);
-                                String latLongCrawler = mogiProcess.getStreetCrawlerToGetLatLong(addressList[0], district
+                                String latLongCrawler = sampleProcess.getStreetCrawlerToGetLatLong(addressList[0], district
                                         ,mogiDataProcess.getWardIdAndDistrictId(addressList,wardList,districtList,district).getWard());
                                 if (!latLongCrawler.isEmpty()) {
                                     sample.setLatitude(mogiDataProcess.getLatitude(latLongCrawler));
@@ -127,7 +129,7 @@ public class MogiUCrawler {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(MogiUCrawler.class.getName()).log(Level.SEVERE, null, e);
         }
         return sampleList;
     }

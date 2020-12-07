@@ -11,6 +11,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GoogleApiCrawler {
     private JSONParser jsonParser = new JSONParser();
@@ -34,7 +36,7 @@ public class GoogleApiCrawler {
             }
             System.out.println("Token lan 1: " + nextPageToken);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(GoogleApiCrawler.class.getName()).log(Level.SEVERE, null, e);
         }
         return nextPageToken;
     }
@@ -59,7 +61,7 @@ public class GoogleApiCrawler {
                 Thread.sleep(4000);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(GoogleApiCrawler.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 }

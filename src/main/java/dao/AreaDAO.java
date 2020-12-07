@@ -1,11 +1,12 @@
 package main.java.dao;
 
+import main.java.JSONParser.JacksonObj;
 import main.java.entity.*;
 import main.java.util.DBUtil;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AreaDAO {
     public void insertDistrict(District district) {
@@ -22,7 +23,7 @@ public class AreaDAO {
                 System.out.println("INSERT DISTRICT SUCCESSFULLY");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(AreaDAO.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     public void insertWard(Ward ward) {
@@ -40,7 +41,7 @@ public class AreaDAO {
                 System.out.println("INSERT WARD SUCCESSFULLY");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(AreaDAO.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -58,7 +59,7 @@ public class AreaDAO {
                 System.out.println("INSERT STREET SUCCESSFULLY");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(AreaDAO.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -71,7 +72,7 @@ public class AreaDAO {
                 return true;
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(AreaDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
@@ -85,7 +86,7 @@ public class AreaDAO {
                 return true;
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(AreaDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
@@ -99,7 +100,7 @@ public class AreaDAO {
                 return true;
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(AreaDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
