@@ -1,13 +1,13 @@
 package main.java.process;
 
 import main.java.JSONParser.JacksonObj;
+import main.java.dao.SampleHostelDAO;
 import main.java.dto.FaSeIdsDTO;
 import main.java.entity.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +16,10 @@ import static main.java.constants.StaticDistrict.*;
 import static main.java.constants.StaticUrl.MOGI;
 
 public class MogiDataProcess {
+    private SampleHostelDAO hostelDAO = new SampleHostelDAO();
+    private List<Street> streetAllList = hostelDAO.getAllStreet();
+    private List<Ward> wardList = hostelDAO.getAllWard();
+    private List<District> districtList = hostelDAO.getAllDistrict();
     public Elements readUrlList(int pageNumber) {
         JacksonObj jacksonObj = new JacksonObj();
         Elements urlList = new Elements();
@@ -50,7 +54,7 @@ public class MogiDataProcess {
         return district;
     }
 
-    public DistrictWard getWardIdAndDistrictId(String[] addressList, List<Ward> wardList, List<District> districtList, String district){
+    public DistrictWard getWardIdAndDistrictId(String[] addressList, String district){
         DistrictWard districtWard = new DistrictWard();
         int districtId = 0;
         int wardId = 0;
@@ -78,7 +82,7 @@ public class MogiDataProcess {
         return districtWard;
     }
 
-    public int getStreetId(String[] addressList, List<Street> streetAllList){
+    public int getStreetId(String[] addressList){
         String streetNameAll = "";
         int streetId = 0;
         String street = addressList[0].trim();
@@ -140,73 +144,20 @@ public class MogiDataProcess {
         return Double.parseDouble(latLong[1]);
     }
 
-    public FaSeIdsDTO getFaSeIds(String description, List<Facility> facilityList, List<Service> serviceList){
-        FaSeIdsDTO faSeIdsDTO = new FaSeIdsDTO();
+    public FaSeIdsDTO getFaSeIds(String description){
         SampleProcess sampleProcess = new SampleProcess();
-        List<String> facilities = new ArrayList<>();
-        List<String> services = new ArrayList<>();
-        if (description.contains("chỗ để xe") || description.contains("nhà xe") || description.contains("xe")) {
-            services.add("Giữ xe");
+        FaSeProcess faSeProcess = new FaSeProcess();
+        FaSeIdsDTO faSeIdsDTO = new FaSeIdsDTO();
+        try{
+            List<Facility> facilityList = hostelDAO.getAllFacilities();
+            List<Service> serviceList = hostelDAO.getAllServices();
+            List<Integer> facilityInteger = sampleProcess.getFacilityIdFromFacilityName(faSeProcess.getFacilities(description), facilityList);
+            List<Integer> serviceInteger = sampleProcess.getServiceIdFromServiceName(faSeProcess.getServices(description), serviceList);
+            faSeIdsDTO.setFacilityInteger(facilityInteger);
+            faSeIdsDTO.setServiceInteger(serviceInteger);
+        }catch (Exception e){
+            Logger.getLogger(MogiDataProcess.class.getName()).log(Level.SEVERE, null, e);
         }
-        if (description.contains("đổ rác")) {
-            services.add("đổ rác");
-        }
-        if (description.contains("thang máy")) {
-            services.add("thang máy");
-        }
-        if (description.contains("dọn vệ sinh") || description.contains("dọn vs")) {
-            services.add("dọn vệ sinh");
-        }
-        if (description.contains("internet") || description.contains("mạng") || description.contains("wifi")) {
-            services.add("internet");
-        }
-        if (description.contains("điện")) {
-            services.add("điện");
-        }
-        if (description.contains("nước")) {
-            services.add("nước");
-        }
-        if (description.contains("máy lạnh") || description.contains("điều hòa")) {
-            facilities.add("Máy lạnh");
-        }
-        if (description.contains("tủ lạnh")) {
-            facilities.add("Tủ lạnh");
-        }
-        if (description.contains("gác") || description.contains("lầu") || description.contains("tầng lửng") || description.contains("gác lửng")) {
-            facilities.add("Gác");
-        }
-        if (description.contains("máy giặt")) {
-            facilities.add("Máy giặt");
-        }
-        if (description.contains("bếp gas") || description.contains("bếp")) {
-            facilities.add("Bếp gas");
-        }
-        if (description.contains("wc riêng") || description.contains("toilet") || description.contains("wc")
-                || description.contains("nhà vệ sinh") || description.contains("nhà vs")) {
-            facilities.add("WC riêng");
-        }
-        if (description.contains("giường ngủ") || description.contains("giường")) {
-            facilities.add("Giường ngủ");
-        }
-        if (description.contains("tủ đồ") || description.contains("tủ") || description.contains("ngăn")) {
-            facilities.add("Tủ đồ");
-        }
-        if (description.contains("cửa sổ") || description.contains("cửa thông gió") || description.contains("cửa")) {
-            facilities.add("Cửa sổ");
-        }
-        if (description.contains("tivi") || description.contains("vô tuyến") || description.contains("ti vi") || description.contains("tv")) {
-            facilities.add("Tivi");
-        }
-        if (description.contains("máy nước nóng") || description.contains("máy nóng lạnh")) {
-            facilities.add("Máy nước nóng");
-        }
-        if (description.contains("balcon") || description.contains("ban công")) {
-            facilities.add("Balcon");
-        }
-        List<Integer> facilityInteger = sampleProcess.getFacilityIdFromFacilityName(facilities, facilityList);
-        List<Integer> serviceInteger = sampleProcess.getServiceIdFromServiceName(services, serviceList);
-        faSeIdsDTO.setFacilityInteger(facilityInteger);
-        faSeIdsDTO.setServiceInteger(serviceInteger);
         return  faSeIdsDTO;
     }
 }

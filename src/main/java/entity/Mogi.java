@@ -12,4 +12,5 @@ public class Mogi {
     private String postTimeAnalysis;
     private String detailUrl;
     private String description;
+    private String number;
 }
