@@ -1,10 +1,14 @@
 package main.java.util;
 
+import main.java.crawler.MogiCrawler;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DBUtil {
     public static Connection getConnectDB(){
@@ -41,7 +45,7 @@ public class DBUtil {
             props.setProperty("password","KieuTrongKhanh!$&");
             conn = DriverManager.getConnection(url, props);
         }catch(SQLException e){
-            System.err.println(e.getMessage());
+            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, e);
         }
         return conn;
     }

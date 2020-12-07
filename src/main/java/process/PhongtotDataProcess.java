@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -18,6 +19,7 @@ import java.util.logging.Logger;
 import static main.java.constants.StaticDistrict.*;
 import static main.java.constants.StaticUrl.PHONG_TOT;
 import static main.java.constants.StaticUrl.PHONG_TOT_HOUSE;
+import static main.java.constants.Synounymous.*;
 
 public class PhongtotDataProcess {
     private SampleHostelDAO hostelDAO = new SampleHostelDAO();
@@ -80,6 +82,9 @@ public class PhongtotDataProcess {
         if (!ward.toLowerCase().contains("phường")) {
             ward = "Phường " + ward;
         }
+        System.out.println("District ngoài : "+ district);
+        System.out.println("Ward ngoài : "+ ward);
+        System.out.println(wardList.size()+" "+districtList.size());
         districtWard.setWard(ward);
         for (int wardItem = 0; wardItem < wardList.size(); wardItem++) {
             if (ward.trim().equalsIgnoreCase(wardList.get(wardItem).getWardName().trim())) {
@@ -89,6 +94,8 @@ public class PhongtotDataProcess {
                     if (district.trim().equalsIgnoreCase(districtNameToEqual)) {
                         districtId = districtList.get(districtItem).getDistrictId();
                         if (wardList.get(wardItem).getDistrictId() == districtId) {
+                            System.out.println("District trong : "+ districtId);
+                            System.out.println("Ward trong : "+ wardId);
                             districtWard.setDistrictId(districtId);
                             districtWard.setWardId(wardId);
                         }
@@ -159,33 +166,9 @@ public class PhongtotDataProcess {
             List<Facility> facilityList = hostelDAO.getAllFacilities();
             List<Service> serviceList = hostelDAO.getAllServices();
             SampleProcess sampleProcess = new SampleProcess();
-            List<String> facilities = new ArrayList<>();
-            List<String> services = new ArrayList<>();
-            for (Element e : faseList) {
-                String fasFinal = e.text().trim();
-                if (fasFinal.equals("Chỗ để xe")) {
-                    fasFinal = "giữ xe";
-                    services.add(fasFinal);
-                } else if (fasFinal.equals("Internet")) {
-                    fasFinal = "internet";
-                    services.add(fasFinal);
-                } else if (fasFinal.equals("Thang máy")) {
-                    fasFinal = "thang máy";
-                    services.add(fasFinal);
-                } else if (fasFinal.equals("Điều hòa")) {
-                    fasFinal = "Máy lạnh";
-                    facilities.add(fasFinal);
-                } else if (fasFinal.equals("Bình nóng lạnh")) {
-                    fasFinal = "Máy nước nóng";
-                    facilities.add(fasFinal);
-                } else if (fasFinal.equals("Máy giặt")) {
-                    facilities.add(fasFinal);
-                } else if (fasFinal.equals("Tivi")) {
-                    facilities.add(fasFinal);
-                }
-            }
-            List<Integer> facilityInteger = sampleProcess.getFacilityIdFromFacilityName(facilities, facilityList);
-            List<Integer> serviceInteger = sampleProcess.getServiceIdFromServiceName(services,serviceList);
+            FaSeProcess faSeProcess = new FaSeProcess();
+            List<Integer> facilityInteger = sampleProcess.getFacilityIdFromFacilityName(faSeProcess.getFacilities(faseList), facilityList);
+            List<Integer> serviceInteger = sampleProcess.getServiceIdFromServiceName(faSeProcess.getServices(faseList),serviceList);
             faSeIdsDTO.setFacilityInteger(facilityInteger);
             faSeIdsDTO.setServiceInteger(serviceInteger);
         }catch(Exception e){
