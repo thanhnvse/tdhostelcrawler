@@ -38,7 +38,6 @@ public class BusCrawler {
             busStationList.add(busStation);
         }
         System.out.println("Size check : " + checkStationList.size());
-
         //Get list station
         //check duplicate route
         stationFinishList = busProcess.checkDuplicateRoute(busProcess.getStationFinishList(checkStationList,busStationList));

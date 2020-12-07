@@ -7,6 +7,8 @@ import javax.naming.NamingException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SampleHostelDAO {
 
@@ -22,12 +24,12 @@ public class SampleHostelDAO {
                     facilitiesIdList.add(rs.getInt("facility_id"));
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
             }
         }
         return facilitiesIdList;
     }
-    public List<Facility> getAllFacilities() throws ClassNotFoundException, SQLException, NamingException {
+    public List<Facility> getAllFacilities() throws SQLException{
         Connection con = null;
         PreparedStatement stm = null;
         ResultSet rs = null;
@@ -72,7 +74,7 @@ public class SampleHostelDAO {
                     servicesIdList.add(rs.getInt("service_id"));
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
             }
         }
         return servicesIdList;
@@ -125,7 +127,7 @@ public class SampleHostelDAO {
                     streetList.add(street);
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
             }
         return streetList;
     }
@@ -144,7 +146,7 @@ public class SampleHostelDAO {
                 wardList.add(ward);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return wardList;
     }
@@ -161,7 +163,7 @@ public class SampleHostelDAO {
                 districtList.add(district);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return districtList;
     }
@@ -180,7 +182,7 @@ public class SampleHostelDAO {
                 System.out.println("INSERT STREET WARD SUCCESSFULLY");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -207,7 +209,7 @@ public class SampleHostelDAO {
                 System.out.println("INSERT SAMPLE SUCCESSFULLY");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -218,7 +220,7 @@ public class SampleHostelDAO {
             ResultSet rs = ps.executeQuery(query)){
             return rs.isBeforeFirst();
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
@@ -233,7 +235,7 @@ public class SampleHostelDAO {
                 streetWardId = rs.getInt("street_ward_id");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return streetWardId;
     }
@@ -246,7 +248,7 @@ public class SampleHostelDAO {
              ResultSet rs = ps.executeQuery(query)){
             return rs.isBeforeFirst();
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
@@ -267,7 +269,7 @@ public class SampleHostelDAO {
                 wardNameList.add(ward);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return wardNameList;
     }
@@ -282,7 +284,7 @@ public class SampleHostelDAO {
                 postAt = rs.getLong("max");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return postAt;
     }
@@ -296,7 +298,7 @@ public class SampleHostelDAO {
                 return true;
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(SampleHostelDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }

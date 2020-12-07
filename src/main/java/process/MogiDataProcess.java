@@ -9,6 +9,8 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static main.java.constants.StaticDistrict.*;
 import static main.java.constants.StaticUrl.MOGI;
@@ -22,7 +24,7 @@ public class MogiDataProcess {
                     "(Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36").get();
             urlList = mogiDoc.select(jacksonObj.readYamlForMogi().getUrlList());
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(MogiDataProcess.class.getName()).log(Level.SEVERE, "Url", e);
         }
         return urlList;
     }
@@ -43,7 +45,7 @@ public class MogiDataProcess {
                 System.out.println("District :" + district);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(MogiDataProcess.class.getName()).log(Level.SEVERE, null, e);
         }
         return district;
     }
@@ -140,7 +142,7 @@ public class MogiDataProcess {
 
     public FaSeIdsDTO getFaSeIds(String description, List<Facility> facilityList, List<Service> serviceList){
         FaSeIdsDTO faSeIdsDTO = new FaSeIdsDTO();
-        MogiProcess mogiProcess = new MogiProcess();
+        SampleProcess sampleProcess = new SampleProcess();
         List<String> facilities = new ArrayList<>();
         List<String> services = new ArrayList<>();
         if (description.contains("chỗ để xe") || description.contains("nhà xe") || description.contains("xe")) {
@@ -201,8 +203,8 @@ public class MogiDataProcess {
         if (description.contains("balcon") || description.contains("ban công")) {
             facilities.add("Balcon");
         }
-        List<Integer> facilityInteger = mogiProcess.getFacilityIdFromFacilityName(facilities, facilityList);
-        List<Integer> serviceInteger = mogiProcess.getServiceIdFromServiceName(services, serviceList);
+        List<Integer> facilityInteger = sampleProcess.getFacilityIdFromFacilityName(facilities, facilityList);
+        List<Integer> serviceInteger = sampleProcess.getServiceIdFromServiceName(services, serviceList);
         faSeIdsDTO.setFacilityInteger(facilityInteger);
         faSeIdsDTO.setServiceInteger(serviceInteger);
         return  faSeIdsDTO;

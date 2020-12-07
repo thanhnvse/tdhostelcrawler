@@ -7,6 +7,8 @@ import javax.naming.NamingException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static main.java.constants.LocationLatLong.*;
 import static main.java.constants.StaticPlaceType.*;
@@ -26,9 +28,7 @@ public class GGDAO {
         List<UType> uTypeList = new ArrayList<>();
         uTypeList.add(new UType(1, CONVENIENCE_STORE_VN, 1));
         uTypeList.add(new UType(2, SUPERMARKET_VN, 1));
-//        uTypeList.add(new UType(3, DEPARTMENT_STORE_VN, 1));
         uTypeList.add(new UType(3, UNIVERSITY_VN, 2));
-//        uTypeList.add(new UType(4, SCHOOL_VN, 2));
         uTypeList.add(new UType(4, PRIMARY_SCHOOL_VN, 2));
         uTypeList.add(new UType(5, SECONDARY_SCHOOL_VN, 2));
         uTypeList.add(new UType(6, BUS_STATION_VN, 3));
@@ -36,7 +36,6 @@ public class GGDAO {
         uTypeList.add(new UType(8, BANK_VN, 4));
         uTypeList.add(new UType(9,  HOSPITAL_VN, 5));
         uTypeList.add(new UType(10, DRUGSTORE_VN, 5));
-//        uTypeList.add(new UType(13, PHARMACY_VN, 5));
         return uTypeList;
     }
 
@@ -44,17 +43,13 @@ public class GGDAO {
         List<String> uTypeList = new ArrayList<>();
         uTypeList.add(CONVENIENCE_STORE);
         uTypeList.add(SUPERMARKET);
-//        uTypeList.add(DEPARTMENT_STORE);
         uTypeList.add(UNIVERSITY);
-//        uTypeList.add(SCHOOL);
         uTypeList.add(PRIMARY_SCHOOL);
         uTypeList.add(SECONDARY_SCHOOL);
-//        uTypeList.add(BUS_STATION);
         uTypeList.add(ATM);
         uTypeList.add(BANK);
         uTypeList.add(HOSPITAL);
         uTypeList.add(DRUGSTORE);
-//        uTypeList.add(PHARMACY);
         return uTypeList;
     }
 
@@ -75,7 +70,7 @@ public class GGDAO {
                     System.out.println("INSERT SUCCESSFULLY");
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                Logger.getLogger(GGDAO.class.getName()).log(Level.SEVERE, null, e);
             }
         }
     }
@@ -123,7 +118,7 @@ public class GGDAO {
                     System.out.println("INSERT TYPE SUCCESSFULLY");
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                Logger.getLogger(GGDAO.class.getName()).log(Level.SEVERE, null, e);
             }
         }
     }
@@ -147,7 +142,7 @@ public class GGDAO {
                         System.out.println("INSERT UTILITY SUCCESSFULLY");
                     }
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    Logger.getLogger(GGDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }catch (Exception e){
@@ -163,7 +158,7 @@ public class GGDAO {
                 return true;
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(GGDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
@@ -177,7 +172,7 @@ public class GGDAO {
                 return true;
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(GGDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
@@ -194,7 +189,7 @@ public class GGDAO {
              ResultSet rs = ps.executeQuery(query)){
             return rs.isBeforeFirst();
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(GGDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
@@ -446,7 +441,7 @@ public class GGDAO {
                 return true;
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Logger.getLogger(GGDAO.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }

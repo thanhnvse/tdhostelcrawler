@@ -1,5 +1,6 @@
 package main.java.process;
 
+import main.java.crawler.GoogleApiCrawler;
 import main.java.dao.AreaDAO;
 import main.java.dao.GGDAO;
 import main.java.entity.*;
@@ -11,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class BusProcess {
@@ -25,7 +28,7 @@ public class BusProcess {
             JSONObject obj = new JSONObject(str);
             routeList = obj.getJSONArray("Routes");
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(BusProcess.class.getName()).log(Level.SEVERE, null, e);
         }
         return routeList;
     }

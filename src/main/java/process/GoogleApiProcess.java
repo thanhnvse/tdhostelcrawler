@@ -1,11 +1,15 @@
 package main.java.process;
 
+import main.java.crawler.MogiUCrawler;
 import main.java.dao.GGDAO;
 import main.java.entity.Utility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GoogleApiProcess {
     public String getNextPageTokenUrl(double latitude, double longitude, int radius, String type){
@@ -22,7 +26,7 @@ public class GoogleApiProcess {
             String jsonGoogleApi = googleApiWeb.body().text();
             obj = new JSONObject(jsonGoogleApi);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(GoogleApiProcess.class.getName()).log(Level.SEVERE, null, e);
         }
         return obj;
     }
