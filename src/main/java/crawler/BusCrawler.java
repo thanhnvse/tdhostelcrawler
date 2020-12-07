@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import main.java.dao.AreaDAO;
 import main.java.dao.GGDAO;
 import main.java.entity.*;
+import main.java.process.BusProcess;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,149 +21,28 @@ public class BusCrawler {
     private List<Station> stationFinishList = new ArrayList<>();
 
     public void getBusInfo() {
-        GGDAO ggdao = new GGDAO();
-        try {
-            String fileName = "data.json";
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(
-                            new FileInputStream(fileName), "UTF8"));
-            String str = in.readLine();
-            JSONObject obj = new JSONObject(str);
-            AreaDAO areaDAO = new AreaDAO();
-
-            //Get all routes
-            JSONArray routeList = obj.getJSONArray("Routes");
-            for (int i = 0; i < routeList.length(); i++) {
-                String routeNo = routeList.getJSONObject(i).getString("RouteNo");
-                JSONArray stationList = routeList.getJSONObject(i).getJSONArray("Stations");
-                List<Bus> busList = new ArrayList<>();
-                for (int j = 0; j < stationList.length(); j++) {
-                    String stationName = stationList.getJSONObject(j).getString("StationName").trim();
-                    double latitude = stationList.getJSONObject(j).getDouble("Lat");
-                    double longitude = stationList.getJSONObject(j).getDouble("Lng");
-                    Bus bus = new Bus();
-                    if (!checkDuplicatedStationName(stationName, latitude, longitude)) {
-                        bus.setStationName(stationName);
-                        bus.setLatitude(latitude);
-                        bus.setLongitude(longitude);
-                        checkStationList.add(bus);
-                    }
-                    bus.setStationName(stationName);
-                    bus.setLatitude(latitude);
-                    bus.setLongitude(longitude);
-                    busList.add(bus);
+        BusProcess busProcess = new BusProcess();
+        JSONArray routeList = busProcess.readJsonFile();
+        for (int i = 0; i < routeList.length(); i++) {
+            JSONArray stationList = busProcess.getStationList(routeList,i);
+            List<Bus> busList = new ArrayList<>();
+            for (int j = 0; j < stationList.length(); j++) {
+                String stationName = busProcess.getStationName(stationList,j);
+                Bus bus = busProcess.setBusFromFile(stationList, j,stationName);
+                if (!busProcess.checkDuplicatedStationName(stationName,checkStationList)) {
+                    checkStationList.add(bus);
                 }
-                BusStation busStation = new BusStation();
-                busStation.setRouteNo(routeNo);
-                busStation.setBusList(busList);
-                busStationList.add(busStation);
+                busList.add(bus);
             }
-            System.out.println("Size check : " + checkStationList.size());
-            // create writer
-//            Writer writer = new FileWriter("StationDuplication.json");
-//            // convert users list to JSON file
-//            new Gson().toJson(checkStationList, writer);
-//            // close writer
-//            writer.close();
-//            System.out.println(checkStationList);
-//            System.out.println(busStationList);
-            //Equality
-            //Get list station
-
-            for (int k = 0; k < checkStationList.size(); k++) {
-                String nameAndNo = "";
-                String stationNameBefore = checkStationList.get(k).getStationName();
-                nameAndNo = stationNameBefore;
-                double lat = checkStationList.get(k).getLatitude();
-                double lng = checkStationList.get(k).getLongitude();
-                //get list Bus station
-                for (int m = 0; m < busStationList.size(); m++) {
-                    int size = busStationList.get(m).getBusList().size();
-                    for (int n = 0; n < size; n++) {
-//                        if(stationNameBefore.equals(busStationList.get(m).getBusList().get(n).getStationName())
-//                        && lat == busStationList.get(m).getBusList().get(n).getLatitude()
-//                        && lng == busStationList.get(m).getBusList().get(n).getLongitude()){
-                        if (stationNameBefore.toLowerCase().equals(busStationList.get(m).getBusList().get(n).getStationName().toLowerCase())) {
-                            nameAndNo = nameAndNo + "--" + busStationList.get(m).getRouteNo();
-                        }
-                    }
-                }
-                Station station = new Station();
-                station.setStationName(nameAndNo);
-                station.setLatitude(checkStationList.get(k).getLatitude());
-                station.setLongitude(checkStationList.get(k).getLongitude());
-                station.setUTypeId(6);
-                stationFinishList.add(station);
-            }
-
-            //check duplicate route
-            for (int a = 0; a < stationFinishList.size(); a++) {
-                String[] stationSplit = stationFinishList.get(a).getStationName().split("--");
-                String stationNameComplete = stationSplit[0];
-                List<String> routeNoList = new ArrayList<>();
-                for (int b = 1; b < stationSplit.length; b++) {
-                    routeNoList.add(stationSplit[b]);
-                }
-                List<String> newList = routeNoList.stream().distinct().collect(Collectors.toList());
-                for (int c = 0; c < newList.size(); c++) {
-                    stationNameComplete = stationNameComplete + " | " + newList.get(c);
-                }
-                stationFinishList.get(a).setStationName(stationNameComplete);
-            }
-//            System.out.println(stationFinishList);
-
-            //insert bus
-            for(Station station : stationFinishList){
-                if (!ggdao.checkInsert(station.getLatitude(), station.getLongitude(), station.getStationName(), station.getUTypeId())) {
-                    Utility utility = new Utility();
-                    utility.setLatitude(station.getLatitude());
-                    utility.setLongitude(station.getLongitude());
-                    utility.setName(station.getStationName());
-                    utility.setTypeId(station.getUTypeId());
-                    ggdao.insertAUtility(utility);
-                }
-            }
-//            for(int d = 1710; d < 1711; d++){
-//                if (!ggdao.checkInsert(stationFinishList.get(d).getLatitude(), stationFinishList.get(d).getLongitude(), stationFinishList.get(d).getStationName(), stationFinishList.get(d).getUTypeId())) {
-//                    Utility utility = new Utility();
-//                    utility.setLatitude(stationFinishList.get(d).getLatitude());
-//                    utility.setLongitude(stationFinishList.get(d).getLongitude());
-//                    utility.setName(stationFinishList.get(d).getStationName());
-//                    utility.setTypeId(stationFinishList.get(d).getUTypeId());
-//                    ggdao.insertAUtility(utility);
-//                }
-//            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            BusStation busStation = busProcess.setBusStationFromFile(routeList,i,busList);
+            busStationList.add(busStation);
         }
-    }
+        System.out.println("Size check : " + checkStationList.size());
 
-    public boolean checkDuplicatedStationName(String stationName, double latitude, double longitude) {
-        boolean check = false;
-        if (checkStationList.size() == 0) {
-            check = false;
-        } else {
-            for (int i = 0; i < checkStationList.size(); i++) {
-//                if(stationName.equals(checkStationList.get(i).getStationName()) && latitude == checkStationList.get(i).getLatitude()
-//                        && longitude == checkStationList.get(i).getLongitude()){
-                if (stationName.equals(checkStationList.get(i).getStationName())) {
-//                    System.out.println("station name : "+ stationName);
-                    check = true;
-                }
-            }
-        }
-        return check;
-    }
-
-    public List<String> removeDuplicates(List<String> list) {
-        List<String> newList = new ArrayList<>();
-        for (String element : list) {
-            if (!newList.equals(element)) {
-                newList.add(element);
-            }
-        }
-        return newList;
+        //Get list station
+        //check duplicate route
+        stationFinishList = busProcess.checkDuplicateRoute(busProcess.getStationFinishList(checkStationList,busStationList));
+        //insert bus
+        busProcess.insertBus(stationFinishList);
     }
 }

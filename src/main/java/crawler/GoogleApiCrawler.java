@@ -3,6 +3,7 @@ package main.java.crawler;
 import main.java.JSONParser.JSONParser;
 import main.java.dao.GGDAO;
 import main.java.entity.Utility;
+import main.java.process.GoogleApiProcess;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,19 +14,14 @@ import java.util.List;
 
 public class GoogleApiCrawler {
     private JSONParser jsonParser = new JSONParser();
-    private  GGDAO ggdao = new GGDAO();
+    private GoogleApiProcess googleApiProcess = new GoogleApiProcess();
     public String getNextPageToken(double latitude, double longitude, int radius, String type) {
-        String mainUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-                latitude + "," + longitude + "&radius=" + radius + "&type=" +
-                type + "&key=AIzaSyBN-EnJaJx_lU8aw-PnGBdumqGRTG8u2dQ" + "&language=vi";
+        String mainUrl = googleApiProcess.getNextPageTokenUrl(latitude,longitude,radius,type);
         System.out.println("LINK : " +mainUrl);
         String nextPageToken = "";
         try {
-            Document googleApiWeb = Jsoup.connect(mainUrl)
-                    .ignoreContentType(true).get();
-            String jsonGoogleApi = googleApiWeb.body().text();
-            JSONObject obj = new JSONObject(jsonGoogleApi);
-            JSONArray arr = obj.getJSONArray("results");
+            JSONObject obj = googleApiProcess.readDataObj(mainUrl);
+            JSONArray arr = googleApiProcess.readDataArr(obj);
             //for to get utility from results
             jsonParser.parseJSONToObject(arr,obj);
             //get next page token
@@ -47,14 +43,10 @@ public class GoogleApiCrawler {
         String nextPageToken = getNextPageToken(latitude,longitude,radius,type);
         try {
             while (nextPageToken != "") {
-                String urlWithNextPageToken = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyBN-EnJaJx_lU8aw-PnGBdumqGRTG8u2dQ" +
-                        "&language=vi&pagetoken=" + nextPageToken;
+                String urlWithNextPageToken = googleApiProcess.getDataNextPageTokenUrl(nextPageToken);
                 System.out.println("LINK : " +urlWithNextPageToken);
-                Document googleApiWebNextToken = Jsoup.connect(urlWithNextPageToken)
-                        .ignoreContentType(true).get();
-                String jsonGoogleApiNextToken = googleApiWebNextToken.body().text();
-                JSONObject objNextToken = new JSONObject(jsonGoogleApiNextToken);
-                JSONArray arrNextToken = objNextToken.getJSONArray("results");
+                JSONObject objNextToken = googleApiProcess.readDataObj(urlWithNextPageToken);
+                JSONArray arrNextToken = googleApiProcess.readDataArr(objNextToken);
                 //for to get utility from results
                 jsonParser.parseJSONToObject(arrNextToken,objNextToken);
                 if (!objNextToken.has("next_page_token")) {
